@@ -21,9 +21,9 @@ Auth con roles · CRUD empleados/departamentos/contratos · Ausencias con saldo 
 | Capa | Tecnología |
 |---|---|
 | Frontend | Vue 3, Vite, Vue Router, Pinia, Axios, CSS propio responsive |
-| Backend | PHP + Laravel 11 (API REST, Sanctum), arquitectura MVC + capa Services |
+| Backend | PHP 8.3 + Laravel 13 (API REST, Sanctum), arquitectura MVC + capa Services |
 | Microservicio | Node.js + Express + **pdfkit** (solo genera PDF) |
-| BD | MySQL 8 |
+| BD | MySQL 8.4 LTS |
 | Infra | Docker + Docker Compose (nginx, php-fpm, mysql, node-pdf, frontend) |
 | Tests | PHPUnit/Pest, test del servicio Node; opcional Playwright |
 

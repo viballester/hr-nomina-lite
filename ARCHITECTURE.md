@@ -3,10 +3,10 @@
 ## Vista general
 
 ```
-Vue 3 (Vite, Pinia, Router) ──HTTP/JSON──► Laravel 11 (API REST, Sanctum)
+Vue 3 (Vite, Pinia, Router) ──HTTP/JSON──► Laravel 13 (API REST, Sanctum)
                                               │            │
                                               ▼            ▼
-                                           MySQL 8    Node.js (Express + pdfkit)
+                                           MySQL 8.4  Node.js (Express + pdfkit)
 ```
 
 - Vue solo habla con Laravel. Node **solo** lo llama Laravel, con un token compartido entre servicios.
@@ -53,9 +53,11 @@ Puntos clave: claves foráneas con restricciones; índices en `(employee_id, sta
 
 > Borrador: se refinará en M1 y los cambios se anotarán en `DECISIONS.md`.
 
-## Servicios Docker (previstos)
+## Servicios Docker
 
-`nginx`, `php-fpm`, `mysql`, `node-pdf`, `frontend` (build estático); en desarrollo, `mailpit` (opcional).
+**Actuales (M0):** `app` (PHP con `artisan serve`, puerto 8000) y `mysql` (sin puerto publicado, datos en el volumen `mysql_data`). Ver D-009.
+
+**Previstos (M8):** `nginx`, `php-fpm`, `mysql`, `node-pdf`, `frontend` (build estático); en desarrollo, `mailpit` (opcional).
 
 ## Seguridad (resumen)
 
