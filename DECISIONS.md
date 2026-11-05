@@ -34,6 +34,14 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Decisión del usuario.** Sustituye a las versiones Laravel 11 y MySQL 8 previstas inicialmente.
 **Por qué:** Laravel 11 no recibe parches de seguridad desde el 12-mar-2026. PHP 8.3 coincide con la versión local y cumple el requisito de Laravel 13. MySQL 8.4 es la rama LTS.
 
+## D-009 · Entorno de desarrollo con `artisan serve --no-reload` (2026-11-05)
+**Decisión:** en M0, Compose levanta solo `app` (PHP) y `mysql`. Las credenciales se definen en el `.env` de la raíz y Compose las pasa a ambos servicios. nginx y php-fpm quedan para M8.
+**Por qué `--no-reload`:** sin esa opción, `artisan serve` descarta las variables de Docker y lee `backend/.env`. Comprobado: las peticiones web usaban SQLite y `artisan migrate` usaba MySQL, sin ningún error visible.
+
+## D-010 · Extensión `intl` e `icu-data-full` en la imagen PHP (2026-11-05)
+**Por qué:** Laravel la necesita para dar formato a números (por ejemplo, `db:show`), y sin `icu-data-full` Alpine no incluye los datos de `es_ES` para los importes.
+**Coste:** la imagen pasa de 153 MB a 220 MB. Revisar en M8 al preparar la imagen final.
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).

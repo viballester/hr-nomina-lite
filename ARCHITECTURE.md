@@ -53,9 +53,11 @@ Puntos clave: claves foráneas con restricciones; índices en `(employee_id, sta
 
 > Borrador: se refinará en M1 y los cambios se anotarán en `DECISIONS.md`.
 
-## Servicios Docker (previstos)
+## Servicios Docker
 
-`nginx`, `php-fpm`, `mysql`, `node-pdf`, `frontend` (build estático); en desarrollo, `mailpit` (opcional).
+**Actuales (M0):** `app` (PHP con `artisan serve`, puerto 8000) y `mysql` (sin puerto publicado, datos en el volumen `mysql_data`). Ver D-009.
+
+**Previstos (M8):** `nginx`, `php-fpm`, `mysql`, `node-pdf`, `frontend` (build estático); en desarrollo, `mailpit` (opcional).
 
 ## Seguridad (resumen)
 
