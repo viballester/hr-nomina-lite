@@ -3,10 +3,10 @@
 ## Vista general
 
 ```
-Vue 3 (Vite, Pinia, Router) ──HTTP/JSON──► Laravel 11 (API REST, Sanctum)
+Vue 3 (Vite, Pinia, Router) ──HTTP/JSON──► Laravel 13 (API REST, Sanctum)
                                               │            │
                                               ▼            ▼
-                                           MySQL 8    Node.js (Express + pdfkit)
+                                           MySQL 8.4  Node.js (Express + pdfkit)
 ```
 
 - Vue solo habla con Laravel. Node **solo** lo llama Laravel, con un token compartido entre servicios.

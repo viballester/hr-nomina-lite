@@ -6,7 +6,7 @@ Se actualiza al final de cada módulo. Marcar solo lo **implementado y verificad
 
 | Módulo | Conceptos a aprender | Tareas completadas | Pendiente / dudas |
 |---|---|---|---|
-| M0 Setup y Git | Flujo de ramas, commits convencionales, `.env`, Docker básico | Estructura de carpetas y docs creada (Paso 3). Identidad de Git, `git init`, `.gitattributes` y primer commit verificados. Versiones comprobadas: Git 2.53, PHP 8.3.30, Composer 2.9.5, Node 24.13, npm 11.8 | Repo en GitHub, flujo de ramas, instalar WSL2 y Docker Desktop, Docker PHP+MySQL |
+| M0 Setup y Git | Flujo de ramas, commits convencionales, `.env`, Docker básico | Estructura de carpetas y docs creada (Paso 3). Identidad de Git, `git init`, `.gitattributes` y primer commit verificados. Versiones comprobadas: Git 2.53, PHP 8.3.30, Composer 2.9.5, Node 24.13, npm 11.8. Repo público en GitHub y primer Pull Request. WSL2 y Docker Desktop verificados con `hello-world` | Crear Laravel 13, Docker PHP+MySQL |
 | M1 BD y modelado | Normalización, FKs, índices, relaciones Eloquent, migraciones, seeders | — | — |
 | M2 Auth y API base | MVC, REST, Form Requests, Resources, Sanctum, Policies | — | — |
 | M3 Ausencias | Service layer, transacciones, reglas de negocio, SOLID | — | — |

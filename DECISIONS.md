@@ -30,6 +30,10 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 ## D-007 · Frontend en Vue 3 con CSS propio (2026-11-04)
 **Por qué:** evitar gastar tiempo en librerías de UI; el objetivo es demostrar componentes, estado y consumo de API.
 
+## D-008 · Versiones: Laravel 13, PHP 8.3 y MySQL 8.4 LTS (2026-11-05)
+**Decisión del usuario.** Sustituye a las versiones Laravel 11 y MySQL 8 previstas inicialmente.
+**Por qué:** Laravel 11 no recibe parches de seguridad desde el 12-mar-2026. PHP 8.3 coincide con la versión local y cumple el requisito de Laravel 13. MySQL 8.4 es la rama LTS.
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).
