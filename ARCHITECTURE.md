@@ -36,8 +36,9 @@ Patrones previstos: Service layer, Strategy (reglas de complementos/retenciones)
 
 ```
 users (id, name, email, password, role)            1─1  employees
-departments (id, name, manager_id→employees)
-employees (id, user_id, department_id, job_title, hire_date, status)
+positions (id, name)
+departments (id, name, manager_id→employees NULL, ON DELETE SET NULL)
+employees (id, user_id UNIQUE, department_id, position_id, hire_date, status)
 contracts (id, employee_id, type, base_salary, start_date, end_date)
 leave_types (id, name, requires_approval, deducts_balance)
 leave_balances (id, employee_id, year, days_total, days_used)
