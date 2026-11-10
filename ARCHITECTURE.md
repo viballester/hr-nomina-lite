@@ -52,7 +52,7 @@ payslip_lines (id, payslip_id, concept, type[earning|deduction], amount)
 
 Puntos clave: claves foráneas con restricciones; índices en `(employee_id, status)` y fechas; importes en `DECIMAL` o céntimos (nunca float); `snapshot` para que una nómina cerrada no cambie si cambia el salario; validación de solapes y saldo con transacciones.
 
-> Borrador: se refinará en M1 y los cambios se anotarán en `DECISIONS.md`.
+> Implementado en M1 (`backend/database/migrations`). Estados y tipos se guardan como texto y se validarán en la aplicación (M2–M4). Cambios futuros: anotar en `DECISIONS.md`.
 
 ## Servicios Docker
 
