@@ -42,6 +42,15 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Por qué:** Laravel la necesita para dar formato a números (por ejemplo, `db:show`), y sin `icu-data-full` Alpine no incluye los datos de `es_ES` para los importes.
 **Coste:** la imagen pasa de 153 MB a 220 MB. Revisar en M8 al preparar la imagen final.
 
+## D-011 · Tabla `positions` en vez de `job_title` (2026-11-06)
+**Decisión del usuario.**
+**Por qué:** evita repetir el nombre del puesto en cada empleado y da soporte al CRUD de puestos del MVP.
+
+## D-012 · Reglas de borrado de las claves foráneas (2026-11-06)
+**Decisión del usuario.** `payslip_lines.payslip_id`: CASCADE. `payslips.employee_id`: RESTRICT. `departments.manager_id`: SET NULL.
+**Por qué:** las líneas no tienen sentido sin su nómina, un empleado con nóminas no debe poder borrarse y un departamento puede quedarse sin responsable.
+**Consecuencia:** `manager_id` es nullable y su FK se añade en una migración posterior a `employees`, para resolver la dependencia circular.
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).
