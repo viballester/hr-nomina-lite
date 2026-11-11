@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use Illuminate\Http\Request;
@@ -24,9 +29,28 @@ class EmployeeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request)
     {
-        //
+        $data = $request->validated();
+
+        $employee = DB::transaction(function () use ($data) {
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make(Str::password(16)),
+            ]);
+
+            return Employee::create([
+                'user_id' => $user->id,
+                'department_id' => $data['department_id'],
+                'position_id' => $data['position_id'],
+                'hire_date' => $data['hire_date'],
+            ]);
+        });
+
+        $employee = $employee->fresh(['user', 'department', 'position']);
+
+        return (new EmployeeResource($employee))->response()->setStatusCode(201);
     }
 
     /**
