@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Http\Resources\EmployeeResource;
+use Illuminate\Support\Arr;
 
 class EmployeeController extends Controller
 {
@@ -66,9 +68,16 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Employee $employee)
+    public function update(UpdateEmployeeRequest $request, Employee $employee)
     {
-        //
+        $data = $request->validated();
+
+        DB::transaction(function () use ($data, $employee) {
+            $employee->user->update(Arr::only($data, ['name', 'email']));
+            $employee->update(Arr::only($data, ['department_id', 'position_id', 'hire_date', 'status']));
+        });
+
+        return new EmployeeResource($employee->fresh(['user', 'department', 'position']));
     }
 
     /**
@@ -76,6 +85,8 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
-        //
+        $employee->update(['status' => 'inactive']);
+
+        return response()->noContent();
     }
 }
