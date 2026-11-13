@@ -13,7 +13,7 @@ class UpdateEmployeeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // la decide EmployeePolicy (tarea 6)
+        return $this->user()->can('update', $this->route('employee'));
     }
 
     /**

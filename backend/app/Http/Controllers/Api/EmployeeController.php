@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Models\User;
@@ -21,6 +22,9 @@ class EmployeeController extends Controller
      */
     public function index(Request $request)
     {
+        Gate::authorize('viewAny', Employee::class);
+        $user = $request->user();
+
         $search = $request->query('search');
 
         $employees = Employee::with(['user', 'department', 'position'])
@@ -30,6 +34,7 @@ class EmployeeController extends Controller
                         ->orWhere('email', 'like', "%{$search}%");
                 });
             })
+            ->when($user->role === 'manager', fn ($q) => $q->where('department_id', $user->employee?->department_id))
             ->orderBy('id')
             ->paginate(15)
             ->withQueryString();
@@ -69,6 +74,7 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
+        Gate::authorize('view', $employee);
         $employee->load(['user', 'department', 'position']);
 
         return new EmployeeResource($employee);
@@ -94,6 +100,7 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
+        Gate::authorize('delete', $employee);
         $employee->update(['status' => 'inactive']);
 
         return response()->noContent();
