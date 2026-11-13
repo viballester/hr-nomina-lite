@@ -16,13 +16,16 @@ class LeaveRequestController extends Controller
 {
     public function index(Request $request)
     {
-        // shortcut: solo las propias; el filtro por rol llega con la Policy en la tarea 5
-        $requests = $request->user()->employee?->leaveRequests()
-            ->with('leaveType')
-            ->latest('start_date')
-            ->paginate(15);
+        $user = $request->user();
+        abort_if($user->employee === null && $user->role !== 'admin', 403, 'Tu usuario no tiene ficha de empleado.');
 
-        abort_if($requests === null, 403, 'Tu usuario no tiene ficha de empleado.');
+        $requests = LeaveRequest::with(['leaveType', 'employee.user'])
+            ->when($user->role === 'employee', fn ($q) => $q->where('employee_id', $user->employee->id))
+            ->when($user->role === 'manager', fn ($q) => $q->whereHas('employee', fn ($e) => $e->where('department_id', $user->employee->department_id)))
+            ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
+            ->latest('start_date')
+            ->paginate(15)
+            ->withQueryString();
 
         return LeaveRequestResource::collection($requests);
     }
@@ -56,5 +59,12 @@ class LeaveRequestController extends Controller
         $data = $request->validate(['comment' => ['required', 'string', 'max:500']]);
 
         return new LeaveRequestResource($service->reject($leaveRequest, $request->user()->employee, $data['comment'])->load('leaveType'));
+    }
+
+    public function cancel(LeaveRequest $leaveRequest, LeaveRequestService $service)
+    {
+        Gate::authorize('cancel', $leaveRequest);
+
+        return new LeaveRequestResource($service->cancel($leaveRequest)->load('leaveType'));
     }
 }

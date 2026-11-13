@@ -19,4 +19,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('leave-requests', LeaveRequestController::class)->only(['index', 'store']);
     Route::patch('leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve']);
     Route::patch('leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject']);
+    Route::patch('leave-requests/{leaveRequest}/cancel', [LeaveRequestController::class, 'cancel']);
 });

@@ -158,4 +158,42 @@ class LeaveRequestService
             return $leaveRequest;
         });
     }
+
+
+    public function cancel(LeaveRequest $leaveRequest): LeaveRequest
+    {
+        return DB::transaction(function () use ($leaveRequest) {
+
+            $locked = LeaveRequest::query()
+                ->whereKey($leaveRequest->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (
+                !in_array($locked->status, ['pending', 'approved']) ||
+                $locked->start_date->lte(today())
+            ) {
+                throw ValidationException::withMessages([
+                    'status' => 'Solo se pueden cancelar solicitudes pendientes o aprobadas que no hayan empezado.',
+                ]);
+            }
+
+            if (
+                $locked->status === 'approved' &&
+                $locked->leaveType->deducts_balance
+            ) {
+                $locked->employee
+                    ->leaveBalances()
+                    ->where('year', $locked->start_date->year)
+                    ->lockForUpdate()
+                    ->firstOrFail()
+                    ->decrement('days_used', $locked->days);
+            }
+
+            $locked->status = 'cancelled';
+            $locked->save();
+
+            return $locked;
+        });
+    }
 }

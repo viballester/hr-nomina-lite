@@ -21,4 +21,9 @@ class LeaveRequestPolicy
         return $user->role === 'manager'
             && $leaveRequest->employee->department_id === $user->employee?->department_id;
     }
+
+    public function cancel(User $user, LeaveRequest $leaveRequest): bool
+    {
+        return $leaveRequest->employee_id === $user->employee?->id;
+    }
 }
