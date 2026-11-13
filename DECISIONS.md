@@ -51,6 +51,19 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Por qué:** las líneas no tienen sentido sin su nómina, un empleado con nóminas no debe poder borrarse y un departamento puede quedarse sin responsable.
 **Consecuencia:** `manager_id` es nullable y su FK se añade en una migración posterior a `employees`, para resolver la dependencia circular.
 
+## D-013 · Reglas de ausencias en `LeaveRequestService` (2026-11-13)
+**Decisión:** controlador fino; días laborables, solapes, saldo y transiciones de estado viven en el servicio. Los errores de negocio se lanzan como `ValidationException` (422).
+**Por qué:** las reglas se prueban sin HTTP y se reutilizan (el seeder crea las ausencias demo con el servicio). `ValidationException` da al frontend un único formato de error sin registrar excepciones propias; alternativa descartada por coste en el MVP.
+
+## D-014 · Saldo: los pendientes reservan días y se descuenta al aprobar (2026-11-13)
+**Decisión:** disponible = `days_total - days_used - pendientes`. `days_used` se incrementa al aprobar (o al crear si el tipo no requiere aprobación) y se devuelve al cancelar una aprobada.
+**Por qué:** evita que dos solicitudes pendientes gasten el mismo saldo. Cada cambio de saldo va en transacción con `lockForUpdate` sobre la solicitud y el saldo.
+**Límites conocidos:** sin festivos ni medios días; no se admiten solicitudes que crucen de año; si cambiara `deducts_balance` de un tipo con solicitudes aprobadas, la cancelación devolvería días según el valor nuevo (no hay endpoint que lo permita).
+
+## D-015 · Autorización de ausencias (2026-11-13)
+**Decisión:** aprueba/rechaza el manager del departamento o el admin, nunca el propio solicitante; cancela solo el propio empleado (pendiente o aprobada no empezada). El listado se filtra en la consulta con `match` por rol y `default => 403`.
+**Por qué:** la Policy decide sobre un objeto, no filtra listas; el filtro cerrado por defecto evita que un rol desconocido herede la visibilidad del admin.
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).

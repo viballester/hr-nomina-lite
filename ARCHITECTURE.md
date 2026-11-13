@@ -30,6 +30,18 @@ APP_WEB/
 
 `Route → Controller (fino) → FormRequest (validación) → Service (lógica de negocio) → Model/Eloquent → MySQL`, y `API Resource` para dar forma a la respuesta. `Policy` para autorización en cada recurso.
 
+Implementado en M3: `LeaveRequestService` (reglas de ausencias, transacciones y bloqueos) y `LeaveRequestPolicy`.
+
+Endpoints de ausencias (todos con `auth:sanctum`):
+```
+GET   /api/leave-requests[?status=]        listado filtrado por rol
+POST  /api/leave-requests                  crear (empleado)
+PATCH /api/leave-requests/{id}/approve     manager del dpto. o admin
+PATCH /api/leave-requests/{id}/reject      ídem, exige comment
+PATCH /api/leave-requests/{id}/cancel      solo el propio empleado
+GET   /api/leave-balance                   saldo del año en curso
+```
+
 Patrones previstos: Service layer, Strategy (reglas de complementos/retenciones), Policy. Repository solo si aporta valor.
 
 ## Modelo de datos inicial
