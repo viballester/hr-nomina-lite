@@ -19,9 +19,15 @@ class LeaveRequestController extends Controller
         $user = $request->user();
         abort_if($user->employee === null && $user->role !== 'admin', 403, 'Tu usuario no tiene ficha de empleado.');
 
-        $requests = LeaveRequest::with(['leaveType', 'employee.user'])
-            ->when($user->role === 'employee', fn ($q) => $q->where('employee_id', $user->employee->id))
-            ->when($user->role === 'manager', fn ($q) => $q->whereHas('employee', fn ($e) => $e->where('department_id', $user->employee->department_id)))
+        // Cerrado por defecto: un rol desconocido no ve nada
+        $query = match ($user->role) {
+            'admin' => LeaveRequest::query(),
+            'manager' => LeaveRequest::whereHas('employee', fn ($e) => $e->where('department_id', $user->employee->department_id)),
+            'employee' => LeaveRequest::where('employee_id', $user->employee->id),
+            default => abort(403),
+        };
+
+        $requests = $query->with(['leaveType', 'employee.user'])
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
             ->latest('start_date')
             ->paginate(15)
@@ -66,5 +72,28 @@ class LeaveRequestController extends Controller
         Gate::authorize('cancel', $leaveRequest);
 
         return new LeaveRequestResource($service->cancel($leaveRequest)->load('leaveType'));
+    }
+
+
+    public function balance(Request $request, LeaveRequestService $service)
+    {
+        $employee = $request->user()->employee;
+
+        if ($employee === null) {
+            abort(403, 'No tienes una ficha de empleado.');
+        }
+
+        $summary = $service->balanceSummary(
+            $employee,
+            now()->year
+        );
+
+        if ($summary === null) {
+            abort(404, 'No hay saldo para este año.');
+        }
+
+        return response()->json([
+            'data' => $summary,
+        ]);
     }
 }

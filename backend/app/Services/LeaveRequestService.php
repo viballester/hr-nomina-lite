@@ -56,25 +56,17 @@ class LeaveRequestService
         }
 
         // 3. Comprobar saldo disponible
+        
         if ($type->deducts_balance) {
-            $balance = $employee->leaveBalances()
-                ->where('year', $start->year)
-                ->first();
+            $summary = $this->balanceSummary($employee, $start->year);
 
-            $pending = $employee->leaveRequests()
-                ->where('status', 'pending')
-                ->whereYear('start_date', $start->year)
-                ->sum('days');
-
-            if (
-                !$balance ||
-                ($balance->days_total - $balance->days_used - $pending) < $days
-            ) {
+            if (!$summary || $summary['days_available'] < $days) {
                 throw ValidationException::withMessages([
                     'leave_type_id' => 'Saldo insuficiente.',
                 ]);
             }
         }
+
 
         // 4. Crear solicitud (y descontar saldo si se autoaprueba), todo o nada
         return DB::transaction(function () use ($employee, $type, $start, $end, $days) {
@@ -196,4 +188,33 @@ class LeaveRequestService
             return $locked;
         });
     }
+
+
+    public function balanceSummary(Employee $employee, int $year): ?array
+    {
+        $balance = $employee->leaveBalances()
+            ->where('year', $year)
+            ->first();
+
+        if (!$balance) {
+            return null;
+        }
+
+        $pending = $employee->leaveRequests()
+            ->where('status', 'pending')
+            ->whereYear('start_date', $year)
+            ->sum('days');
+
+        return [
+            'days_total' => (int) $balance->days_total,
+            'days_used' => (int) $balance->days_used,
+            'days_pending' => (int) $pending,
+            'days_available' => (int) (
+                $balance->days_total - $balance->days_used - $pending
+            ),
+        ];
+    }
+
+
+
 }

@@ -16,6 +16,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('employees', EmployeeController::class);
     Route::apiResource('departments', DepartmentController::class);
     Route::apiResource('positions', PositionController::class);
+    Route::get('/leave-balance', [LeaveRequestController::class, 'balance']);
     Route::apiResource('leave-requests', LeaveRequestController::class)->only(['index', 'store']);
     Route::patch('leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve']);
     Route::patch('leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject']);

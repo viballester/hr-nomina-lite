@@ -122,4 +122,27 @@ class LeaveCancelAndListApiTest extends TestCase
         $this->getJson('/api/leave-requests')->assertJsonCount(2, 'data');
         $this->getJson('/api/leave-requests?status=pending')->assertJsonCount(1, 'data');
     }
+
+    public function test_rol_desconocido_no_ve_el_listado(): void
+    {
+        $this->request($this->employee);
+        $this->employee->user->forceFill(['role' => 'Manager'])->save();
+        Sanctum::actingAs($this->employee->user);
+
+        $this->getJson('/api/leave-requests')->assertForbidden();
+    }
+
+    // --- Saldo ---
+
+    public function test_saldo_descuenta_usados_y_pendientes(): void
+    {
+        $this->request($this->employee, '2026-11-16', '2026-11-17');
+        $leave = $this->request($this->employee, '2026-11-23', '2026-11-25');
+        app(LeaveRequestService::class)->approve($leave, $this->employeeWithRole('manager', $this->nominas));
+        Sanctum::actingAs($this->employee->user);
+
+        $this->getJson('/api/leave-balance')
+            ->assertOk()
+            ->assertExactJson(['data' => ['days_total' => 22, 'days_used' => 3, 'days_pending' => 2, 'days_available' => 17]]);
+    }
 }
