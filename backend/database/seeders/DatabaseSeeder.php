@@ -11,6 +11,8 @@ use App\Models\Position;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Services\LeaveRequestService;
+use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
@@ -62,7 +64,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $departments[0]->update(['manager_id' => $manager->id]);
 
-        $this->createEmployee($departments[0], $positions[1], [
+        $empleado = $this->createEmployee($departments[0], $positions[1], [
             'name' => 'Empleado Demo', 'email' => 'empleado@demo.test', 'role' => 'employee',
         ]);
 
@@ -70,6 +72,15 @@ class DatabaseSeeder extends Seeder
         foreach (range(1, 20) as $i) {
             $this->createEmployee($departments->random(), $positions->random());
         }
+
+        // 4. Ausencias demo, creadas con el servicio para que cumplan las reglas
+        $service = app(LeaveRequestService::class);
+        $vacaciones = LeaveType::where('name', 'Vacaciones')->first();
+        $year = now()->year;
+
+        $verano = $service->create($empleado, $vacaciones, Carbon::create($year, 8, 3), Carbon::create($year, 8, 14));
+        $service->approve($verano, $manager);
+        $service->create($empleado, $vacaciones, Carbon::create($year, 12, 14), Carbon::create($year, 12, 18));
     }
 
     // Crea usuario + empleado + contrato + saldo del año actual
