@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 class LeaveRequestService
 {
@@ -75,18 +76,86 @@ class LeaveRequestService
             }
         }
 
-        // 4. Crear solicitud
-        $leaveRequest = $employee->leaveRequests()->make([
-            'leave_type_id' => $type->id,
-            'start_date' => $start,
-            'end_date' => $end,
-            'days' => $days,
-        ]);
+        // 4. Crear solicitud (y descontar saldo si se autoaprueba), todo o nada
+        return DB::transaction(function () use ($employee, $type, $start, $end, $days) {
+            $leaveRequest = $employee->leaveRequests()->make([
+                'leave_type_id' => $type->id,
+                'start_date' => $start,
+                'end_date' => $end,
+                'days' => $days,
+            ]);
 
-        // status no está en fillable: se asigna aparte
-        $leaveRequest->status = 'pending';
-        $leaveRequest->save();
+            // status no está en fillable: se asigna aparte
+            $leaveRequest->status = $type->requires_approval ? 'pending' : 'approved';
+            $leaveRequest->save();
 
-        return $leaveRequest;
+            if (!$type->requires_approval && $type->deducts_balance) {
+                $employee->leaveBalances()
+                    ->where('year', $start->year)
+                    ->lockForUpdate()
+                    ->firstOrFail()
+                    ->increment('days_used', $days);
+            }
+
+            return $leaveRequest;
+        });
+    }
+
+    private function lockPending(LeaveRequest $request): LeaveRequest
+    {
+        $locked = LeaveRequest::query()
+            ->whereKey($request->id)
+            ->lockForUpdate()
+            ->firstOrFail();
+
+        if ($locked->status !== 'pending') {
+            throw ValidationException::withMessages([
+                'status' => 'Solo se pueden revisar solicitudes pendientes.',
+            ]);
+        }
+
+        return $locked;
+    }
+
+    public function approve(LeaveRequest $leaveRequest, Employee $reviewer): LeaveRequest
+    {
+        return DB::transaction(function () use ($leaveRequest, $reviewer) {
+
+            $leaveRequest = $this->lockPending($leaveRequest);
+
+            if ($leaveRequest->leaveType->deducts_balance) {
+                $leaveRequest->employee
+                    ->leaveBalances()
+                    ->where('year', $leaveRequest->start_date->year)
+                    ->lockForUpdate()
+                    ->firstOrFail()
+                    ->increment('days_used', $leaveRequest->days);
+            }
+
+            $leaveRequest->status = 'approved';
+            $leaveRequest->reviewed_by = $reviewer->id;
+            $leaveRequest->reviewed_at = now();
+
+            $leaveRequest->save();
+
+            return $leaveRequest;
+        });
+    }
+
+    public function reject(LeaveRequest $leaveRequest, Employee $reviewer, string $comment): LeaveRequest
+    {
+        return DB::transaction(function () use ($leaveRequest, $reviewer, $comment) {
+
+            $leaveRequest = $this->lockPending($leaveRequest);
+
+            $leaveRequest->status = 'rejected';
+            $leaveRequest->review_comment = $comment;
+            $leaveRequest->reviewed_by = $reviewer->id;
+            $leaveRequest->reviewed_at = now();
+
+            $leaveRequest->save();
+
+            return $leaveRequest;
+        });
     }
 }

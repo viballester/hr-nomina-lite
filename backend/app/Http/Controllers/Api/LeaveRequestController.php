@@ -9,6 +9,8 @@ use App\Models\LeaveType;
 use App\Services\LeaveRequestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Models\LeaveRequest;
+use Illuminate\Support\Facades\Gate;
 
 class LeaveRequestController extends Controller
 {
@@ -39,5 +41,20 @@ class LeaveRequestController extends Controller
         return (new LeaveRequestResource($leaveRequest->load('leaveType')))
             ->response()
             ->setStatusCode(201);
+    }
+
+    public function approve(Request $request, LeaveRequest $leaveRequest, LeaveRequestService $service)
+    {
+        Gate::authorize('review', $leaveRequest);
+
+        return new LeaveRequestResource($service->approve($leaveRequest, $request->user()->employee)->load('leaveType'));
+    }
+
+    public function reject(Request $request, LeaveRequest $leaveRequest, LeaveRequestService $service)
+    {
+        Gate::authorize('review', $leaveRequest);
+        $data = $request->validate(['comment' => ['required', 'string', 'max:500']]);
+
+        return new LeaveRequestResource($service->reject($leaveRequest, $request->user()->employee, $data['comment'])->load('leaveType'));
     }
 }
