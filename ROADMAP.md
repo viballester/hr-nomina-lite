@@ -1,7 +1,7 @@
 # ROADMAP
 
 **Fecha límite:** 30-nov-2026 · **Cierre objetivo:** 28-nov · **Inicio:** 4-nov-2026
-**Dedicación:** ~6 h/día · **Estado global:** M0 y M1 completados (M1 verificado con `migrate:fresh --seed`, 10-nov). Siguiente: M2.
+**Dedicación:** ~6 h/día · **Estado global:** M0, M1 y M2 completados (M2 verificado con 30 tests de PHPUnit, 13-nov). Siguiente: M3.
 
 Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 
@@ -11,7 +11,7 @@ Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 |---|---|---|---|
 | M0 | Setup, Git/GitHub, Docker base (PHP + MySQL) | — | ✅ |
 | M1 | Modelado ER, migraciones, seeders, factories, Eloquent | M0 | ✅ |
-| M2 | Auth (Sanctum), roles, Policies, CRUD empleados, validación y errores | M1 | ⬜ |
+| M2 | Auth (Sanctum), roles, Policies, CRUD empleados, validación y errores | M1 | ✅ |
 | M3 | Ausencias: solicitud, saldo, aprobación, solapes | M2 | ⬜ |
 | M4 | Nóminas: periodos, cálculo simplificado, líneas, snapshot | M2 | ⬜ |
 | M5 | Microservicio Node (pdfkit) + integración Laravel↔Node | M4 | ⬜ |
