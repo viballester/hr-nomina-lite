@@ -1,7 +1,7 @@
 # ROADMAP
 
 **Fecha límite:** 30-nov-2026 · **Cierre objetivo:** 28-nov · **Inicio:** 4-nov-2026
-**Dedicación:** ~6 h/día · **Estado global:** M0–M3 completados (M3 verificado con 58 tests de PHPUnit, 13-nov). Siguiente: M4 o M6.
+**Dedicación:** ~6 h/día · **Estado global:** M0–M3 completados (M3 verificado con 58 tests de PHPUnit, 13-nov). M6 en curso (tareas 1–4 de 8, 16-nov). Siguiente: M6 Tarea 5 (Router con guard).
 
 Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 
@@ -15,7 +15,7 @@ Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 | M3 | Ausencias: solicitud, saldo, aprobación, solapes | M2 | ✅ |
 | M4 | Nóminas: periodos, cálculo simplificado, líneas, snapshot | M2 | ⬜ |
 | M5 | Microservicio Node (pdfkit) + integración Laravel↔Node | M4 | ⬜ |
-| M6 | Frontend Vue (login, empleados, ausencias, nóminas, dashboard) | M2 (paralelo a M3/M4) | ⬜ |
+| M6 | Frontend Vue (login, empleados, ausencias, nóminas, dashboard) | M2 (paralelo a M3/M4) | 🟨 |
 | M7 | Testing, seguridad (OWASP), rate limiting, CORS | M3–M6 | ⬜ |
 | M8 | Docker Compose completo, README, capturas, API docs | todo | ⬜ |
 

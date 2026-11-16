@@ -12,7 +12,7 @@ Se actualiza al final de cada módulo. Marcar solo lo **implementado y verificad
 | M3 Ausencias | Service layer, transacciones, reglas de negocio, SOLID | `LeaveRequestService` con días laborables (Carbon), solapes, saldo con pendientes reservados (`balanceSummary()`, una sola fuente de verdad) y autoaprobación. Aprobar/rechazar/cancelar con `DB::transaction` + `lockForUpdate` y máquina de estados (`pending → approved/rejected/cancelled`). Errores de negocio como `ValidationException` (422 con el mismo formato que el Form Request). `LeaveRequestPolicy` (`review`: nadie se aprueba a sí mismo, ni el admin; `cancel`). Listado filtrado por rol con `match` cerrado por defecto y `?status=`. Inyección de dependencias en controladores. Seeder que crea ausencias a través del servicio. 58 tests (unitarios con `#[DataProvider]`, integración, `travelTo`) | Errores repetidos: bloquear la solicitud pero olvidar `lockForUpdate` en el saldo (tareas 4 y 5); volver a `create()`+`save()` en vez de `make()`; añadir una línea nueva en vez de modificar la existente (seeder). Pendiente: festivos, medios días, solicitudes que cruzan de año. Concurrencia real solo verificable en MySQL (SQLite ignora los bloqueos) |
 | M4 Nóminas | Strategy, precisión monetaria, tests unitarios | — | — |
 | M5 Microservicio Node | Express, pdfkit, integración entre servicios, tokens internos | — | — |
-| M6 Frontend Vue | Componentes, Pinia, Router con guards, formularios, consumo de API | — | — |
+| M6 Frontend Vue | Componentes, Pinia, Router con guards, formularios, consumo de API | **En curso (rama `feat/m6-frontend`).** Plan de 8 tareas: 1 proyecto, 2 formulario, 3 login real, 4 Pinia, 5 Router + guard + layout, 6 listado empleados, 7 alta/edición empleado, 8 ausencias. Hechas 1–4: Vue 3 + Vite (JS, sin TypeScript), Router, Pinia, Axios. `LoginView` con `ref`, `v-model`, `@submit.prevent`, `v-if`, `:disabled`. Proxy de Vite `/api` → `localhost:8000` (sin CORS en desarrollo). Cliente `src/api/http.js` con `Accept: application/json` e interceptor que añade `Authorization: Bearer`. Store `auth` (token en `localStorage`, `login`, `fetchUser`, `logout`). `catch` con `?.` y `??` (502 del proxy si Laravel está caído). Verificado en navegador: 200, 422, 502 y token persistente tras recargar | Pendiente: responder si `required` en el formulario hace innecesaria la validación del `AuthController`. Tarea 4 la terminó Claude: repasar `stores/auth.js` y el interceptor. Aún sin probar `logout()` (llega con el menú en la Tarea 5), ni interceptor de 401. Nóminas y dashboard dependen de M4. Errores vistos: etiqueta de cierre suelta fuera de `<template>`. Instalar extensión *Vue - Official* en Cursor para el resaltado |
 | M7 Testing y seguridad | PHPUnit/Pest, tests de integración, XSS/CSRF/SQLi/IDOR | — | — |
 | M8 Despliegue | Docker Compose, entornos, secretos, documentación | — | — |
 
@@ -43,6 +43,11 @@ Se actualiza al final de cada módulo. Marcar solo lo **implementado y verificad
 - [ ] Por qué "nadie se aprueba a sí mismo" va antes del bypass del admin en la Policy
 - [ ] Por qué el filtro de un listado debe ser "cerrado por defecto"
 - [ ] Qué es un refactor y cómo demuestran los tests que no cambia el comportamiento
+
+- [ ] Por qué el proxy de Vite evita CORS en desarrollo (y qué cambia en producción)
+- [ ] Por qué la validación del servidor es obligatoria aunque el formulario tenga `required`
+- [ ] Riesgo de guardar el token en `localStorage` (XSS) y alternativa con cookies `HttpOnly`
+- [ ] Por qué ocultar un botón en Vue no es seguridad (la seguridad son las Policies)
 
 ## Notas
 - Dedicación estimada: ~6 h/día.

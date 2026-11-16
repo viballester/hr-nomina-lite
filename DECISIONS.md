@@ -64,6 +64,14 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Decisión:** aprueba/rechaza el manager del departamento o el admin, nunca el propio solicitante; cancela solo el propio empleado (pendiente o aprobada no empezada). El listado se filtra en la consulta con `match` por rol y `default => 403`.
 **Por qué:** la Policy decide sobre un objeto, no filtra listas; el filtro cerrado por defecto evita que un rol desconocido herede la visibilidad del admin.
 
+## D-016 · Frontend en JavaScript, Vite en local y proxy `/api` (2026-11-16)
+**Decisión:** Vue sin TypeScript; en desarrollo Vite corre fuera de Docker (`npm run dev`) y reenvía `/api` a `localhost:8000`.
+**Por qué:** TypeScript no cabe en el plazo; Vite local da recarga instantánea (el contenedor `frontend` llega en M8); el proxy deja un solo origen y evita configurar CORS en desarrollo (CORS se trata en M7).
+
+## D-017 · Token Sanctum en `localStorage` con interceptor de Axios (2026-11-16)
+**Decisión:** el store `auth` guarda el token en `localStorage`; un interceptor de petición añade `Authorization: Bearer` leyendo de `localStorage` (no del store, para evitar la dependencia circular store ↔ http).
+**Por qué:** simple y coherente con la API por tokens de M2. Riesgo conocido: un XSS podría leer el token. Alternativa (Sanctum SPA con cookies `HttpOnly`) descartada en el MVP; se documenta en M7.
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).
