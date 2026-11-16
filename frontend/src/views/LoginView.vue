@@ -1,24 +1,21 @@
-
 <script setup>
 import { ref } from 'vue'
-import http from '@/api/http'
+import { useAuthStore } from '@/stores/auth'
 
 const email = ref('')
 const password = ref('')
 const error = ref('')
 const loading = ref(false)
+const auth = useAuthStore()
 
 async function login() {
   error.value = ''
   loading.value = true
 
   try {
-    const response = await http.post('/login', {
-      email: email.value,
-      password: password.value
-    })
-
-    console.log(response.data.user)
+    await auth.login(email.value, password.value)
+    await auth.fetchUser() // comprueba que el token funciona; en la Tarea 5 se usará al recargar
+    console.log(auth.user)
   } catch (e) {
     error.value = e.response?.data?.message ?? 'No se ha podido conectar con el servidor.'
   } finally {
