@@ -20,6 +20,8 @@ async function logout() {
 
       <nav class="nav" aria-label="Principal">
         <RouterLink to="/">Inicio</RouterLink>
+        <!-- Ocultar el enlace es comodidad, no seguridad: la API ya responde 403 -->
+        <RouterLink v-if="['admin', 'manager'].includes(auth.user?.role)" to="/employees">Empleados</RouterLink>
       </nav>
 
       <div class="session">

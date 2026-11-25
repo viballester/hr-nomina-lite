@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth'
 import LoginView from '@/views/LoginView.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import HomeView from '@/views/HomeView.vue'
+import EmployeesView from '@/views/EmployeesView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,8 @@ const router = createRouter({
       component: AppLayout,
       children: [
         { path: '', name: 'home', component: HomeView },
+        // meta.roles: solo estos roles pueden entrar (la API devolvería 403 al resto)
+        { path: 'employees', name: 'employees', component: EmployeesView, meta: { roles: ['admin', 'manager'] } },
       ],
     },
     // Cualquier URL desconocida vuelve al inicio
@@ -43,6 +46,10 @@ router.beforeEach(async (to) => {
       // 401: el interceptor de http.js cierra la sesión y redirige al login.
       // Otro error (servidor caído): seguimos y cada vista muestra su propio error.
     }
+  }
+
+  if (to.meta.roles && !to.meta.roles.includes(auth.user?.role)) {
+    return { name: 'home' }
   }
 })
 
