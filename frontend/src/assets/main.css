@@ -431,3 +431,33 @@ h2 {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.kpi:hover,
+.kpi:focus-visible {
+  border-color: var(--color-primary);
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

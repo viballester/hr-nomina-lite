@@ -19,15 +19,7 @@ class LeaveRequestController extends Controller
         $user = $request->user();
         abort_if($user->employee === null && $user->role !== 'admin', 403, 'Tu usuario no tiene ficha de empleado.');
 
-        // Cerrado por defecto: un rol desconocido no ve nada
-        $query = match ($user->role) {
-            'admin' => LeaveRequest::query(),
-            'manager' => LeaveRequest::whereHas('employee', fn ($e) => $e->where('department_id', $user->employee->department_id)),
-            'employee' => LeaveRequest::where('employee_id', $user->employee->id),
-            default => abort(403),
-        };
-
-        $requests = $query->with(['leaveType', 'employee.user'])
+        $requests = LeaveRequest::visibleTo($user)->with(['leaveType', 'employee.user'])
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
             ->latest('start_date')
             ->paginate(15)
