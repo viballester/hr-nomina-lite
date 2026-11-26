@@ -23,6 +23,12 @@ class LeaveRequestResource extends JsonResource
             'days' => $this->days,
             'status' => $this->status,
             'review_comment' => $this->review_comment,
+            // Qué puede hacer el usuario actual, según la misma Policy que protege los endpoints.
+            // Así el frontend no duplica reglas como "nadie se aprueba a sí mismo".
+            'can' => [
+                'review' => $request->user()?->can('review', $this->resource) ?? false,
+                'cancel' => $request->user()?->can('cancel', $this->resource) ?? false,
+            ],
         ];
     }
 }

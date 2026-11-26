@@ -1,0 +1,418 @@
+/* Variables de diseño: se cambian aquí y afectan a toda la app */
+:root {
+  --color-bg: #f4f6f9;
+  --color-surface: #ffffff;
+  --color-text: #1f2933;
+  --color-muted: #616e7c;
+  --color-border: #d9e2ec;
+  --color-primary: #1f4e8c;
+  --color-primary-hover: #173b6a;
+  --color-error: #b42318;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem;
+}
+
+a {
+  color: var(--color-primary);
+}
+
+/* Foco visible para quien navega con teclado */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Botones */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-bg);
+}
+
+/* Formularios */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font: inherit;
+  background: var(--color-surface);
+}
+
+.error {
+  color: var(--color-error);
+  margin: 0.75rem 0 0;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+}
+
+/* Login: tarjeta centrada en la pantalla */
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.login .card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.login .btn {
+  width: 100%;
+}
+
+/* Layout privado: cabecera, contenido y pie */
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap; /* en móvil, menú y sesión bajan de línea */
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.brand {
+  font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--color-muted);
+}
+
+/* RouterLink añade esta clase al enlace de la ruta actual */
+.nav a.router-link-exact-active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.session {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-bg);
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.content {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.footer {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+/* Cabecera de página: título a la izquierda y acciones a la derecha */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.page-header h1 {
+  margin: 0;
+}
+
+.search {
+  width: 100%;
+  max-width: 320px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font: inherit;
+}
+
+/* Tablas: en pantallas estrechas se desplazan dentro de su caja, no la página */
+.table-wrapper {
+  padding: 0;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.table th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-muted);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+[aria-busy='true'] .table {
+  opacity: 0.6;
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.badge-active {
+  background: #e3f4e8;
+  color: #1e6b3a;
+}
+
+.badge-inactive {
+  background: #fdecea;
+  color: var(--color-error);
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  color: var(--color-muted);
+}
+
+/* Formularios de alta y edición */
+.form {
+  max-width: 560px;
+}
+
+.field [aria-invalid='true'] {
+  border-color: var(--color-error);
+}
+
+.field-error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-error);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+a.btn {
+  text-decoration: none;
+}
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #fdecea;
+}
+
+/* Texto solo para lectores de pantalla */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+h2 {
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+}
+
+.page-header h2 {
+  margin: 0;
+}
+
+/* Ausencias: saldo y formulario lado a lado; en móvil, uno debajo del otro */
+.leave-top {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.stats dt {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.stats dd {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.stats .stat-main {
+  font-size: 2rem;
+  color: var(--color-primary);
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0 1rem;
+}
+
+.form-message {
+  margin: 0.75rem 0 0;
+}
+
+.btn-small {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cell-comment {
+  white-space: normal;
+  min-width: 160px;
+  color: var(--color-muted);
+}
+
+.badge-pending {
+  background: #fff4e0;
+  color: #8a5300;
+}
+
+.badge-approved {
+  background: #e3f4e8;
+  color: #1e6b3a;
+}
+
+.badge-rejected {
+  background: #fdecea;
+  color: var(--color-error);
+}
+
+.badge-cancelled {
+  background: #eceff3;
+  color: var(--color-muted);
+}

@@ -123,4 +123,27 @@ class LeaveReviewApiTest extends TestCase
 
         $this->assertSame(1, $this->daysUsed());
     }
+
+    public function test_el_listado_indica_que_acciones_puede_hacer_cada_usuario(): void
+    {
+        Sanctum::actingAs($this->employeeWithRole('manager', $this->nominas)->user);
+        $this->getJson('/api/leave-requests')
+            ->assertOk()
+            ->assertJsonPath('data.0.can', ['review' => true, 'cancel' => false]);
+
+        Sanctum::actingAs($this->employee->user);
+        $this->getJson('/api/leave-requests')
+            ->assertOk()
+            ->assertJsonPath('data.0.can', ['review' => false, 'cancel' => true]);
+    }
+
+    public function test_tipos_de_ausencia_requieren_sesion_y_se_listan(): void
+    {
+        $this->getJson('/api/leave-types')->assertUnauthorized();
+
+        Sanctum::actingAs($this->employee->user);
+        $this->getJson('/api/leave-types')
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Vacaciones');
+    }
 }

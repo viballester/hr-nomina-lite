@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\LeaveRequestController;
+use App\Http\Controllers\Api\LeaveTypeController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -17,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('departments', DepartmentController::class);
     Route::apiResource('positions', PositionController::class);
     Route::get('/leave-balance', [LeaveRequestController::class, 'balance']);
+    Route::get('/leave-types', [LeaveTypeController::class, 'index']);
     Route::apiResource('leave-requests', LeaveRequestController::class)->only(['index', 'store']);
     Route::patch('leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve']);
     Route::patch('leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject']);

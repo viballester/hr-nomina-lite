@@ -64,6 +64,22 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Decisión:** aprueba/rechaza el manager del departamento o el admin, nunca el propio solicitante; cancela solo el propio empleado (pendiente o aprobada no empezada). El listado se filtra en la consulta con `match` por rol y `default => 403`.
 **Por qué:** la Policy decide sobre un objeto, no filtra listas; el filtro cerrado por defecto evita que un rol desconocido herede la visibilidad del admin.
 
+## D-016 · Frontend en JavaScript, Vite en local y proxy `/api` (2026-11-16)
+**Decisión:** Vue sin TypeScript; en desarrollo Vite corre fuera de Docker (`npm run dev`) y reenvía `/api` a `localhost:8000`.
+**Por qué:** TypeScript no cabe en el plazo; Vite local da recarga instantánea (el contenedor `frontend` llega en M8); el proxy deja un solo origen y evita configurar CORS en desarrollo (CORS se trata en M7).
+
+## D-017 · Token Sanctum en `localStorage` con interceptor de Axios (2026-11-16)
+**Decisión:** el store `auth` guarda el token en `localStorage`; un interceptor de petición añade `Authorization: Bearer` leyendo de `localStorage` (no del store, para evitar la dependencia circular store ↔ http).
+**Por qué:** simple y coherente con la API por tokens de M2. Riesgo conocido: un XSS podría leer el token. Alternativa (Sanctum SPA con cookies `HttpOnly`) descartada en el MVP; se documenta en M7.
+
+## D-018 · Mensajes de validación de la API en español (2026-11-26)
+**Decisión:** `APP_LOCALE=es` (Compose y `.env.example`) con `lang/es/validation.php` y `lang/es.json` traducidos a mano solo para las reglas que usa la API; el resto cae en inglés (`APP_FALLBACK_LOCALE=en`).
+**Por qué:** el frontend pinta los mensajes 422 tal cual debajo de cada campo. Se evita añadir un paquete de traducciones (`laravel-lang`) por una docena de mensajes. Ningún test depende del texto de los mensajes (58 en verde tras el cambio).
+
+## D-019 · Permisos por recurso en la respuesta (`can`) (2026-11-26)
+**Decisión:** `LeaveRequestResource` devuelve `can: { review, cancel }` calculado con `$request->user()->can(...)`, es decir, con la misma `LeaveRequestPolicy` que protege los endpoints. El frontend muestra Aprobar/Rechazar/Cancelar según esos valores.
+**Por qué:** evita copiar en Vue reglas como "nadie se aprueba a sí mismo" o "el manager solo revisa su departamento": una sola fuente de verdad. Las reglas de estado (solo pendientes, que no haya empezado) siguen en el servicio y llegan como 422 si el usuario lo intenta. Alternativa descartada: duplicar las reglas en el frontend.
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).
