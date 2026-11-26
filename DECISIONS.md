@@ -76,6 +76,10 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Decisión:** `APP_LOCALE=es` (Compose y `.env.example`) con `lang/es/validation.php` y `lang/es.json` traducidos a mano solo para las reglas que usa la API; el resto cae en inglés (`APP_FALLBACK_LOCALE=en`).
 **Por qué:** el frontend pinta los mensajes 422 tal cual debajo de cada campo. Se evita añadir un paquete de traducciones (`laravel-lang`) por una docena de mensajes. Ningún test depende del texto de los mensajes (58 en verde tras el cambio).
 
+## D-019 · Permisos por recurso en la respuesta (`can`) (2026-11-26)
+**Decisión:** `LeaveRequestResource` devuelve `can: { review, cancel }` calculado con `$request->user()->can(...)`, es decir, con la misma `LeaveRequestPolicy` que protege los endpoints. El frontend muestra Aprobar/Rechazar/Cancelar según esos valores.
+**Por qué:** evita copiar en Vue reglas como "nadie se aprueba a sí mismo" o "el manager solo revisa su departamento": una sola fuente de verdad. Las reglas de estado (solo pendientes, que no haya empezado) siguen en el servicio y llegan como 422 si el usuario lo intenta. Alternativa descartada: duplicar las reglas en el frontend.
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).

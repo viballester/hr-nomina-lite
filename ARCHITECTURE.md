@@ -40,7 +40,27 @@ PATCH /api/leave-requests/{id}/approve     manager del dpto. o admin
 PATCH /api/leave-requests/{id}/reject      ídem, exige comment
 PATCH /api/leave-requests/{id}/cancel      solo el propio empleado
 GET   /api/leave-balance                   saldo del año en curso
+GET   /api/leave-types                     catálogo de tipos (cualquier usuario autenticado)
 ```
+
+Cada solicitud incluye `can: { review, cancel }`, calculado con `LeaveRequestPolicy` para el usuario actual (D-019).
+
+## Frontend (Vue 3) — M6
+
+```
+frontend/src/
+├─ main.js              crea la app: Pinia + Router + assets/main.css
+├─ api/http.js          instancia Axios: baseURL /api, Bearer (petición), 401 → login (respuesta)
+├─ stores/auth.js       sesión: token (localStorage), user, login/fetchUser/logout
+├─ router/index.js      rutas + guard global (meta.public, meta.roles, ?redirect=)
+├─ layouts/AppLayout    cabecera con menú por rol, Salir, pie con aviso legal
+├─ views/               LoginView, HomeView, EmployeesView, EmployeeFormView, LeaveRequestsView
+├─ components/          AppPagination (lee el meta de paginate() de Laravel)
+├─ utils/format.js      formatDate
+└─ assets/main.css      variables de diseño y estilos globales (sin librería de UI, D-007)
+```
+
+En desarrollo, Vite (`:5173`) reenvía `/api` a Laravel (`:8000`), así que hay un solo origen y no hace falta CORS (D-016). El guard y los botones ocultos por rol son comodidad: la autorización real la hacen las Policies.
 
 Patrones previstos: Service layer, Strategy (reglas de complementos/retenciones), Policy. Repository solo si aporta valor.
 
