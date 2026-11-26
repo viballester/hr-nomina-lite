@@ -91,6 +91,10 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Por qué:** permite corregir datos antes del cierre sin duplicar nóminas.
 **Límites:** sin prorrateo; un empleado dado de baja lógica durante el mes no genera nómina.
 
+## D-022 · Acceso a las nóminas (2026-11-26)
+**Decisión:** los periodos solo los gestiona el admin. Cada empleado, también el manager, ve únicamente sus nóminas y solo de periodos cerrados; el admin ve todas, incluidos los borradores.
+**Por qué:** el salario es un dato sensible y un borrador puede cambiar. El listado filtra en la consulta (cerrado por defecto) y la ficha usa la Policy (evita IDOR).
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).

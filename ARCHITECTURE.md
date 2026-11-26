@@ -47,6 +47,18 @@ GET   /api/leave-types                     catálogo de tipos (cualquier usuario
 
 Cada solicitud incluye `can: { review, cancel }`, calculado con `LeaveRequestPolicy` para el usuario actual (D-019).
 
+Endpoints de nóminas (M4, todos con `auth:sanctum`):
+```
+GET   /api/payroll-periods                  admin
+POST  /api/payroll-periods                  admin: {year, month}
+POST  /api/payroll-periods/{id}/generate    admin, solo en borrador
+PATCH /api/payroll-periods/{id}/close       admin
+GET   /api/payslips[?period_id=]            propias cerradas; admin todas
+GET   /api/payslips/{id}                    detalle con líneas y snapshot
+```
+
+Datos demo: `php artisan db:seed --class=PayrollSeeder` (repetible).
+
 ## Frontend (Vue 3) — M6
 
 ```
