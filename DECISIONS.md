@@ -72,6 +72,10 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Decisión:** el store `auth` guarda el token en `localStorage`; un interceptor de petición añade `Authorization: Bearer` leyendo de `localStorage` (no del store, para evitar la dependencia circular store ↔ http).
 **Por qué:** simple y coherente con la API por tokens de M2. Riesgo conocido: un XSS podría leer el token. Alternativa (Sanctum SPA con cookies `HttpOnly`) descartada en el MVP; se documenta en M7.
 
+## D-018 · Mensajes de validación de la API en español (2026-11-26)
+**Decisión:** `APP_LOCALE=es` (Compose y `.env.example`) con `lang/es/validation.php` y `lang/es.json` traducidos a mano solo para las reglas que usa la API; el resto cae en inglés (`APP_FALLBACK_LOCALE=en`).
+**Por qué:** el frontend pinta los mensajes 422 tal cual debajo de cada campo. Se evita añadir un paquete de traducciones (`laravel-lang`) por una docena de mensajes. Ningún test depende del texto de los mensajes (58 en verde tras el cambio).
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).

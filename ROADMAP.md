@@ -1,7 +1,7 @@
 # ROADMAP
 
 **Fecha límite:** 30-nov-2026 · **Cierre objetivo:** 28-nov · **Inicio:** 4-nov-2026
-**Dedicación:** ~6 h/día · **Estado global:** M0–M3 completados (M3 verificado con 58 tests de PHPUnit, 13-nov). M6 en curso (tareas 1–6 de 8, 25-nov). Siguiente: M6 Tarea 7 (alta y edición de empleado). Desde el 25-nov Claude escribe el código y el usuario lo revisa; se mantiene el plan completo.
+**Dedicación:** ~6 h/día · **Estado global:** M0–M3 completados (M3 verificado con 58 tests de PHPUnit, 13-nov). M6 en curso (tareas 1–7 de 8, 26-nov). Siguiente: M6 Tarea 8 (ausencias). Desde el 25-nov Claude escribe el código y el usuario lo revisa; se mantiene el plan completo.
 
 Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 
