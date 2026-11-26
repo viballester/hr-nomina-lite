@@ -95,6 +95,12 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Decisión:** los periodos solo los gestiona el admin. Cada empleado, también el manager, ve únicamente sus nóminas y solo de periodos cerrados; el admin ve todas, incluidos los borradores.
 **Por qué:** el salario es un dato sensible y un borrador puede cambiar. El listado filtra en la consulta (cerrado por defecto) y la ficha usa la Policy (evita IDOR).
 
+## D-023 · Contrato y seguridad del pdf-service (2026-11-26)
+**Decisión:** Laravel envía a `POST /payslips/pdf` un JSON con los datos del snapshot y los importes como texto `"0.00"` (cast `decimal:2`); Node valida (422), solo formatea y nunca suma. Token `Bearer` compartido (`PDF_SERVICE_TOKEN`) comparado en tiempo constante; sin token el servicio no arranca. Sin puerto publicado: solo accesible en la red de Compose. Laravel autoriza con la misma Policy que `show` **antes** de llamar a Node y traduce caídas, timeouts (10 s) o errores 5xx a un 503 (`PdfServiceUnavailableException`).
+**Por qué:** una sola fuente de verdad para importes y permisos (D-003, D-005, D-022); si Node cae, solo falla la descarga.
+**Detalles:** validación escrita a mano (pocos campos, sin Zod/Joi); importes acotados a 10 dígitos enteros tras una revisión de seguridad (ReDoS); tests de Node con `node:test` (sin Jest) y de Laravel con `Http::fake()`.
+**Límites:** sin paginación del recibo (máx. 50 líneas); sin caché de PDFs, se generan en cada descarga.
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).
