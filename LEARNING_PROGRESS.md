@@ -76,6 +76,10 @@ Se actualiza al final de cada módulo. Marcar solo lo **implementado y verificad
 - [ ] Qué es una petición preflight (`OPTIONS`)
 - [ ] Qué es el clickjacking y cómo lo evitan `X-Frame-Options` y `frame-ancestors`
 - [ ] Por qué los datos personales llevan `Cache-Control: no-store`
+- [ ] Recorrer el OWASP Top 10 con `docs/SECURITY.md` y saber señalar el código de cada fila
+- [ ] Por qué la baja de un empleado debe revocar sus tokens y no solo cambiar un estado
+- [ ] Por qué el login responde igual a "no existe" y a "dado de baja" (enumeración de usuarios)
+- [ ] Qué hacen `composer audit` y `npm audit` y cómo se corrige un aviso sin romper nada
 
 ## Notas
 - Dedicación estimada: ~6 h/día.

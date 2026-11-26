@@ -111,6 +111,11 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Por qué:** "cerrado por defecto"; la API sirve datos personales y salarios, que no deben cachearse ni embeberse. En desarrollo el proxy de Vite hace que no haya peticiones de origen cruzado.
 **Detalles:** el middleware es global (no del grupo `api`) porque así también cubre las respuestas de error como el 401. La CSP estricta vale para la API; el frontend necesitará la suya cuando lo sirva nginx (M8).
 
+## D-026 · Baja de empleados y caducidad de tokens (2026-11-26)
+**Decisión:** al dar de baja un empleado se borran sus tokens y el login lo rechaza con el mismo mensaje que unas credenciales incorrectas. Los tokens Sanctum caducan a los 480 min (`SANCTUM_EXPIRATION`); el interceptor de Vue ya cierra la sesión ante un 401.
+**Por qué:** hallazgos del repaso OWASP (A01 y A07, ver `docs/SECURITY.md`): una baja no cortaba el acceso y un token robado valía para siempre.
+**Límites:** un ex-empleado no puede descargar sus nóminas antiguas; los tokens caducados no se borran de la tabla.
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).

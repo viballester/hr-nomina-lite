@@ -160,4 +160,28 @@ class EmployeeApiTest extends TestCase
 
         $this->assertDatabaseHas('employees', ['id' => $empleado->id, 'status' => 'inactive']);
     }
+
+    public function test_la_baja_revoca_los_tokens_y_bloquea_el_login(): void
+    {
+        $empleado = $this->employeeWithRole('employee', $this->rrhh);
+        $empleado->user->update(['password' => 'secreto123']);
+        $empleado->user->createToken('api');
+
+        Sanctum::actingAs($this->employeeWithRole('admin', $this->rrhh)->user);
+        $this->deleteJson("/api/employees/{$empleado->id}")->assertNoContent();
+
+        $this->assertDatabaseMissing('personal_access_tokens', ['tokenable_id' => $empleado->user_id]);
+        $this->postJson('/api/login', ['email' => $empleado->user->email, 'password' => 'secreto123'])
+            ->assertStatus(422);
+    }
+
+    public function test_un_token_caducado_responde_401(): void
+    {
+        $user = $this->employeeWithRole('employee', $this->rrhh)->user;
+        $token = $user->createToken('api')->plainTextToken;
+
+        $this->travel(config('sanctum.expiration') + 1)->minutes();
+
+        $this->withToken($token)->getJson('/api/me')->assertStatus(401);
+    }
 }
