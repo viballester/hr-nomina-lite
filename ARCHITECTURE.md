@@ -36,6 +36,7 @@ Implementado en M4: `Services/Payroll` (`PayrollCalculator` + reglas `PayrollRul
 
 Endpoints de ausencias (todos con `auth:sanctum`):
 ```
+GET   /api/dashboard                       KPIs de inicio filtrados por rol
 GET   /api/leave-requests[?status=]        listado filtrado por rol
 POST  /api/leave-requests                  crear (empleado)
 PATCH /api/leave-requests/{id}/approve     manager del dpto. o admin
