@@ -29,4 +29,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('payroll-periods/{payrollPeriod}/generate', [PayrollPeriodController::class, 'generate']);
     Route::patch('payroll-periods/{payrollPeriod}/close', [PayrollPeriodController::class, 'close']);
     Route::apiResource('payslips', PayslipController::class)->only(['index', 'show']);
+    Route::get('payslips/{payslip}/pdf', [PayslipController::class, 'pdf']);
 });

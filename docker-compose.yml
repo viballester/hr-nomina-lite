@@ -15,9 +15,24 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       APP_LOCALE: es
       APP_FAKER_LOCALE: es_ES
+      PDF_SERVICE_URL: http://pdf:3000
+      PDF_SERVICE_TOKEN: ${PDF_SERVICE_TOKEN}
     depends_on:
       mysql:
         condition: service_healthy
+      pdf:
+        condition: service_healthy
+
+  # Microservicio de PDF: sin puerto publicado, solo accesible desde la red interna
+  pdf:
+    build: ./services/pdf-service
+    environment:
+      PDF_SERVICE_TOKEN: ${PDF_SERVICE_TOKEN}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   mysql:
     image: mysql:8.4

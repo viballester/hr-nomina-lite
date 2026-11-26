@@ -55,7 +55,18 @@ POST  /api/payroll-periods/{id}/generate    admin, solo en borrador
 PATCH /api/payroll-periods/{id}/close       admin
 GET   /api/payslips[?period_id=]            propias cerradas; admin todas
 GET   /api/payslips/{id}                    detalle con líneas y snapshot
+GET   /api/payslips/{id}/pdf                recibo PDF (mismo permiso que el detalle); 503 si el pdf-service no responde
 ```
+
+Flujo del PDF (M5, D-023):
+```
+Vue ─GET /api/payslips/{id}/pdf─► PayslipController@pdf
+                                   ├─ Gate 'view' (PayslipPolicy) ── 403 si no
+                                   └─ PayslipPdfClient ─POST /payslips/pdf (Bearer token)─► pdf-service (Express)
+                                                                                            ├─ validate.js (422)
+                                                                                            └─ pdfkit → stream PDF
+```
+`services/pdf-service/src`: `app.js` (rutas y errores), `auth.js` (token), `validate.js`, `payslipPdf.js`; `server.js` solo arranca. Tests: `npm test` (`node:test`).
 
 Datos demo: `php artisan db:seed --class=PayrollSeeder` (repetible).
 
@@ -102,9 +113,9 @@ Puntos clave: claves foráneas con restricciones; índices en `(employee_id, sta
 
 ## Servicios Docker
 
-**Actuales (M0):** `app` (PHP con `artisan serve`, puerto 8000) y `mysql` (sin puerto publicado, datos en el volumen `mysql_data`). Ver D-009.
+**Actuales:** `app` (PHP con `artisan serve`, puerto 8000), `mysql` (sin puerto publicado, datos en el volumen `mysql_data`, D-009) y `pdf` (Node 22 alpine, sin puerto publicado, healthcheck en `/health`; `app` espera a que esté sano). Ver D-023.
 
-**Previstos (M8):** `nginx`, `php-fpm`, `mysql`, `node-pdf`, `frontend` (build estático); en desarrollo, `mailpit` (opcional).
+**Previstos (M8):** `nginx`, `php-fpm`, `mysql`, `pdf`, `frontend` (build estático); en desarrollo, `mailpit` (opcional).
 
 ## Seguridad (resumen)
 
