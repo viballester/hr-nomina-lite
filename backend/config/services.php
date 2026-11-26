@@ -14,6 +14,13 @@ return [
     |
     */
 
+    // Microservicio Node que genera los recibos PDF (solo lo llama Laravel)
+    'pdf' => [
+        'url' => env('PDF_SERVICE_URL', 'http://pdf:3000'),
+        'token' => env('PDF_SERVICE_TOKEN'),
+        'timeout' => (int) env('PDF_SERVICE_TIMEOUT', 10),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

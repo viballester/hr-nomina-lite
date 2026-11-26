@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PayslipResource;
 use App\Models\PayrollPeriod;
 use App\Models\Payslip;
+use App\Services\Pdf\PayslipPdfClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -40,5 +41,18 @@ class PayslipController extends Controller
         Gate::authorize('view', $payslip);
 
         return new PayslipResource($payslip->load('lines', 'payrollPeriod'));
+    }
+
+    // Mismo permiso que ver la nómina: quien no puede verla tampoco descarga el PDF
+    public function pdf(Payslip $payslip, PayslipPdfClient $client)
+    {
+        Gate::authorize('view', $payslip);
+
+        $filename = sprintf('nomina-%d-%02d-%d.pdf', $payslip->snapshot['year'], $payslip->snapshot['month'], $payslip->id);
+
+        return response($client->render($payslip), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
     }
 }
