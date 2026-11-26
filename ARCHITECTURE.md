@@ -79,7 +79,7 @@ frontend/src/
 ├─ stores/auth.js       sesión: token (localStorage), user, login/fetchUser/logout
 ├─ router/index.js      rutas + guard global (meta.public, meta.roles, ?redirect=)
 ├─ layouts/AppLayout    cabecera con menú por rol, Salir, pie con aviso legal
-├─ views/               LoginView, HomeView, EmployeesView, EmployeeFormView, LeaveRequestsView
+├─ views/               LoginView, HomeView, EmployeesView, EmployeeFormView, LeaveRequestsView, PayrollPeriodsView, PayslipsView, PayslipDetailView
 ├─ components/          AppPagination (lee el meta de paginate() de Laravel)
 ├─ utils/format.js      formatDate
 └─ assets/main.css      variables de diseño y estilos globales (sin librería de UI, D-007)
