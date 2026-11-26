@@ -12,6 +12,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Employee extends Model
 {
     use HasFactory;
+
+    // Cualquier camino que dé de baja (DELETE o PUT con status) corta las sesiones abiertas.
+    protected static function booted(): void
+    {
+        static::updated(function (Employee $employee) {
+            if ($employee->wasChanged('status') && $employee->status === 'inactive') {
+                $employee->user?->tokens()->delete();
+            }
+        });
+    }
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

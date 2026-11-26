@@ -175,6 +175,17 @@ class EmployeeApiTest extends TestCase
             ->assertStatus(422);
     }
 
+    public function test_la_baja_por_edicion_tambien_revoca_los_tokens(): void
+    {
+        $empleado = $this->employeeWithRole('employee', $this->rrhh);
+        $empleado->user->createToken('api');
+
+        Sanctum::actingAs($this->employeeWithRole('admin', $this->rrhh)->user);
+        $this->putJson("/api/employees/{$empleado->id}", ['status' => 'inactive'])->assertOk();
+
+        $this->assertDatabaseMissing('personal_access_tokens', ['tokenable_id' => $empleado->user_id]);
+    }
+
     public function test_un_token_caducado_responde_401(): void
     {
         $user = $this->employeeWithRole('employee', $this->rrhh)->user;

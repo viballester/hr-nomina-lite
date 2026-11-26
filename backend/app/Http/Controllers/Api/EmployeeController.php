@@ -102,7 +102,6 @@ class EmployeeController extends Controller
     {
         Gate::authorize('delete', $employee);
         $employee->update(['status' => 'inactive']);
-        $employee->user->tokens()->delete(); // la baja corta también las sesiones abiertas
 
         return response()->noContent();
     }
