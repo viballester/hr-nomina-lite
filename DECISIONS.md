@@ -116,7 +116,12 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Por qué:** hallazgos del repaso OWASP (A01 y A07, ver `docs/SECURITY.md`): una baja no cortaba el acceso y un token robado valía para siempre.
 **Límites:** un ex-empleado no puede descargar sus nóminas antiguas; los tokens caducados no se borran de la tabla.
 
+## D-027 · Tests del frontend con Vitest y barrido de rutas protegidas (2026-11-26)
+**Decisión:** Vitest (usa la misma configuración de Vite, alias `@` incluido) para probar lógica pura del frontend: utilidades de formato y el store de auth con `http` simulado (`vi.mock`) y `localStorage` en memoria; sin jsdom ni tests de componentes. En el backend, `ProtectedRoutesTest` recorre todas las rutas `api/*` y exige 401 sin token.
+**Por qué:** máximo valor con el mínimo de dependencias; el barrido de rutas detecta automáticamente una ruta nueva que se quede fuera de `auth:sanctum`.
+**Límites:** no hay tests de componentes ni end-to-end; las pantallas se verifican a mano en el navegador.
+
 ## Pendientes de decidir
-- Pest vs PHPUnit (M7).
+- ~~Pest vs PHPUnit (M7)~~ → PHPUnit, el que ya usamos (99 tests): cambiar no aporta en el plazo.
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).
 - Despliegue en vivo (Render/VPS) o solo Docker + README (M8).

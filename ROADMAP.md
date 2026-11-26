@@ -16,7 +16,7 @@ Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 | M4 | Nóminas: periodos, cálculo simplificado, líneas, snapshot | M2 | 🟨 implementado y verificado (81 tests); falta el repaso |
 | M5 | Microservicio Node (pdfkit) + integración Laravel↔Node | M4 | ✅ verificado (11 tests Node + 86 Laravel, curl de punta a punta) |
 | M6 | Frontend Vue (login, empleados, ausencias, nóminas, dashboard) | M2 (paralelo a M3/M4) | ✅ verificado (tareas 1–10, 90 tests de backend) |
-| M7 | Testing, seguridad (OWASP), rate limiting, CORS | M3–M6 | 🟨 tareas 1–3 (rate limiting, CORS y cabeceras, repaso OWASP) hechas, 99 tests |
+| M7 | Testing, seguridad (OWASP), rate limiting, CORS | M3–M6 | 🟨 tareas 1–4 hechas (rate limiting, CORS y cabeceras, OWASP, tests): 100 tests de backend + 8 Vitest |
 | M8 | Docker Compose completo, README, capturas, API docs | todo | ⬜ |
 
 ## Calendario

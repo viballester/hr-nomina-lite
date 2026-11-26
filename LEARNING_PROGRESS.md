@@ -80,6 +80,9 @@ Se actualiza al final de cada módulo. Marcar solo lo **implementado y verificad
 - [ ] Por qué la baja de un empleado debe revocar sus tokens y no solo cambiar un estado
 - [ ] Por qué el login responde igual a "no existe" y a "dado de baja" (enumeración de usuarios)
 - [ ] Qué hacen `composer audit` y `npm audit` y cómo se corrige un aviso sin romper nada
+- [ ] Qué es un mock (`vi.mock`) y por qué el test del store no hace peticiones reales
+- [ ] Por qué un test que recorre todas las rutas protege mejor que uno por ruta
+- [ ] Por qué `formatMoney('1234.50')` da "1234,50 €" y no "1.234,50 €"
 
 ## Notas
 - Dedicación estimada: ~6 h/día.
