@@ -1,7 +1,7 @@
 # ROADMAP
 
 **Fecha límite:** 30-nov-2026 · **Cierre objetivo:** 28-nov · **Inicio:** 4-nov-2026
-**Dedicación:** ~6 h/día · **Estado global:** M0–M3 completados (M3 verificado con 58 tests de PHPUnit, 13-nov). M6: tareas 1–8 completadas (26-nov); quedan las pantallas de nóminas y dashboard, que dependen de M4. M4 (nóminas) implementado y verificado con 81 tests (26-nov), pendiente del repaso. M5 (PDF) completado y verificado (26-nov, rama `feat/m5-pdf`). Pantallas de nóminas (M6 tarea 9) hechas y verificadas (26-nov, rama `feat/m6-nominas-frontend`). Dashboard (tarea 10) hecho: M6 completado. Siguiente: M7 (testing y seguridad). Desde el 25-nov Claude escribe el código y el usuario lo revisa; se mantiene el plan completo.
+**Dedicación:** ~6 h/día · **Estado global:** M0–M3 completados (M3 verificado con 58 tests de PHPUnit, 13-nov). M6: tareas 1–8 completadas (26-nov); quedan las pantallas de nóminas y dashboard, que dependen de M4. M4 (nóminas) implementado y verificado con 81 tests (26-nov), pendiente del repaso. M5 (PDF) completado y verificado (26-nov, rama `feat/m5-pdf`). Pantallas de nóminas (M6 tarea 9) hechas y verificadas (26-nov, rama `feat/m6-nominas-frontend`). Dashboard (tarea 10) hecho: M6 completado. M7 (testing y seguridad) completado y verificado (26-nov, rama `feat/m7-seguridad`). Siguiente: M8 (Docker Compose completo, README, API docs). Desde el 25-nov Claude escribe el código y el usuario lo revisa; se mantiene el plan completo.
 
 Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 
@@ -16,7 +16,7 @@ Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 | M4 | Nóminas: periodos, cálculo simplificado, líneas, snapshot | M2 | 🟨 implementado y verificado (81 tests); falta el repaso |
 | M5 | Microservicio Node (pdfkit) + integración Laravel↔Node | M4 | ✅ verificado (11 tests Node + 86 Laravel, curl de punta a punta) |
 | M6 | Frontend Vue (login, empleados, ausencias, nóminas, dashboard) | M2 (paralelo a M3/M4) | ✅ verificado (tareas 1–10, 90 tests de backend) |
-| M7 | Testing, seguridad (OWASP), rate limiting, CORS | M3–M6 | 🟨 tareas 1–4 hechas (rate limiting, CORS y cabeceras, OWASP, tests): 101 tests de backend + 8 Vitest |
+| M7 | Testing, seguridad (OWASP), rate limiting, CORS | M3–M6 | ✅ verificado (101 tests de backend + 8 Vitest, `docs/SECURITY.md`) |
 | M8 | Docker Compose completo, README, capturas, API docs | todo | ⬜ |
 
 ## Calendario
