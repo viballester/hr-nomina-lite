@@ -81,6 +81,9 @@ class DatabaseSeeder extends Seeder
         $verano = $service->create($empleado, $vacaciones, Carbon::create($year, 8, 3), Carbon::create($year, 8, 14));
         $service->approve($verano, $manager);
         $service->create($empleado, $vacaciones, Carbon::create($year, 12, 14), Carbon::create($year, 12, 18));
+
+        // 5. Nóminas demo
+        $this->call(PayrollSeeder::class);
     }
 
     // Crea usuario + empleado + contrato + saldo del año actual

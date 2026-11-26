@@ -1,7 +1,7 @@
 # ROADMAP
 
 **Fecha límite:** 30-nov-2026 · **Cierre objetivo:** 28-nov · **Inicio:** 4-nov-2026
-**Dedicación:** ~6 h/día · **Estado global:** M0–M3 completados (M3 verificado con 58 tests de PHPUnit, 13-nov). M6: tareas 1–8 completadas (26-nov); quedan las pantallas de nóminas y dashboard, que dependen de M4. Siguiente: M4 (nóminas). Desde el 25-nov Claude escribe el código y el usuario lo revisa; se mantiene el plan completo.
+**Dedicación:** ~6 h/día · **Estado global:** M0–M3 completados (M3 verificado con 58 tests de PHPUnit, 13-nov). M6: tareas 1–8 completadas (26-nov); quedan las pantallas de nóminas y dashboard, que dependen de M4. M4 (nóminas) implementado y verificado con 81 tests (26-nov), pendiente del repaso. Siguiente: M5 (PDF) y pantallas de nóminas. Desde el 25-nov Claude escribe el código y el usuario lo revisa; se mantiene el plan completo.
 
 Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 
@@ -13,7 +13,7 @@ Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 | M1 | Modelado ER, migraciones, seeders, factories, Eloquent | M0 | ✅ |
 | M2 | Auth (Sanctum), roles, Policies, CRUD empleados, validación y errores | M1 | ✅ |
 | M3 | Ausencias: solicitud, saldo, aprobación, solapes | M2 | ✅ |
-| M4 | Nóminas: periodos, cálculo simplificado, líneas, snapshot | M2 | ⬜ |
+| M4 | Nóminas: periodos, cálculo simplificado, líneas, snapshot | M2 | 🟨 implementado y verificado (81 tests); falta el repaso |
 | M5 | Microservicio Node (pdfkit) + integración Laravel↔Node | M4 | ⬜ |
 | M6 | Frontend Vue (login, empleados, ausencias, nóminas, dashboard) | M2 (paralelo a M3/M4) | 🟨 login, empleados y ausencias ✅; nóminas y dashboard tras M4 |
 | M7 | Testing, seguridad (OWASP), rate limiting, CORS | M3–M6 | ⬜ |

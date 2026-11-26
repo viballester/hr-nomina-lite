@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\LeaveRequestController;
 use App\Http\Controllers\Api\LeaveTypeController;
+use App\Http\Controllers\Api\PayrollPeriodController;
+use App\Http\Controllers\Api\PayslipController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -23,4 +25,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve']);
     Route::patch('leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject']);
     Route::patch('leave-requests/{leaveRequest}/cancel', [LeaveRequestController::class, 'cancel']);
+    Route::apiResource('payroll-periods', PayrollPeriodController::class)->only(['index', 'store']);
+    Route::post('payroll-periods/{payrollPeriod}/generate', [PayrollPeriodController::class, 'generate']);
+    Route::patch('payroll-periods/{payrollPeriod}/close', [PayrollPeriodController::class, 'close']);
+    Route::apiResource('payslips', PayslipController::class)->only(['index', 'show']);
 });

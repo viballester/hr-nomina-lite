@@ -4,6 +4,9 @@
 // cualquier otra cae en el idioma de respaldo (APP_FALLBACK_LOCALE=en).
 return [
     'after_or_equal' => 'El campo :attribute debe ser una fecha igual o posterior a :date.',
+    'between' => [
+        'numeric' => 'El campo :attribute debe estar entre :min y :max.',
+    ],
     'date' => 'El campo :attribute debe ser una fecha válida.',
     'email' => 'El campo :attribute debe ser un email válido.',
     'exists' => 'El :attribute seleccionado no es válido.',
@@ -28,5 +31,7 @@ return [
         'leave_type_id' => 'tipo de ausencia',
         'start_date' => 'fecha de inicio',
         'end_date' => 'fecha de fin',
+        'year' => 'año',
+        'month' => 'mes',
     ],
 ];

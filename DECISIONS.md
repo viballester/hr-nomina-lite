@@ -80,6 +80,21 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Decisión:** `LeaveRequestResource` devuelve `can: { review, cancel }` calculado con `$request->user()->can(...)`, es decir, con la misma `LeaveRequestPolicy` que protege los endpoints. El frontend muestra Aprobar/Rechazar/Cancelar según esos valores.
 **Por qué:** evita copiar en Vue reglas como "nadie se aprueba a sí mismo" o "el manager solo revisa su departamento": una sola fuente de verdad. Las reglas de estado (solo pendientes, que no haya empezado) siguen en el servicio y llegan como 422 si el usuario lo intenta. Alternativa descartada: duplicar las reglas en el frontend.
 
+## D-020 · Cálculo de nómina con reglas (Strategy) en céntimos enteros (2026-11-26)
+**Decisión:** cada concepto implementa `PayrollRule`; `PayrollCalculator` aplica primero los devengos y después las deducciones sobre el bruto. Se calcula en céntimos (`int`), los porcentajes en puntos básicos y se redondea cada línea al céntimo (mitades hacia arriba). Concreta D-005.
+**Reglas ficticias:** salario base; 30,00 € por trienio; IRPF simulado 15 %; cotización simulada 6,35 %.
+**Por qué:** un concepto nuevo es una clase nueva (abierto/cerrado) y se prueba sin base de datos. Alternativa descartada: un único método con todas las fórmulas.
+**Límites:** sin prorrateo de meses incompletos, pagas extra ni importes negativos.
+
+## D-021 · Generación y cierre de periodos en `PayrollService` (2026-11-26)
+**Decisión:** un periodo en borrador puede regenerarse (borra sus nóminas y las recalcula); uno cerrado no cambia. Generar y cerrar van en transacción con `lockForUpdate` sobre el periodo. El snapshot (D-006) se guarda al generar y queda congelado al cerrar. Entran los empleados activos con contrato vigente algún día del mes; con varios, el más reciente. La antigüedad se cuenta a fin de mes.
+**Por qué:** permite corregir datos antes del cierre sin duplicar nóminas.
+**Límites:** sin prorrateo; un empleado dado de baja lógica durante el mes no genera nómina.
+
+## D-022 · Acceso a las nóminas (2026-11-26)
+**Decisión:** los periodos solo los gestiona el admin. Cada empleado, también el manager, ve únicamente sus nóminas y solo de periodos cerrados; el admin ve todas, incluidos los borradores.
+**Por qué:** el salario es un dato sensible y un borrador puede cambiar. El listado filtra en la consulta (cerrado por defecto) y la ficha usa la Policy (evita IDOR).
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).
