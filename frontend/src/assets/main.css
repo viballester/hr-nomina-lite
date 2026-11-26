@@ -416,3 +416,18 @@ h2 {
   background: #eceff3;
   color: var(--color-muted);
 }
+
+.badge-draft {
+  background: #fff4e0;
+  color: #8a5300;
+}
+
+.badge-closed {
+  background: #e3f4e8;
+  color: #1e6b3a;
+}
+
+.amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
