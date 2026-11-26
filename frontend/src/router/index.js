@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import HomeView from '@/views/HomeView.vue'
 import EmployeesView from '@/views/EmployeesView.vue'
 import EmployeeFormView from '@/views/EmployeeFormView.vue'
+import LeaveRequestsView from '@/views/LeaveRequestsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +21,7 @@ const router = createRouter({
         { path: 'employees', name: 'employees', component: EmployeesView, meta: { roles: ['admin', 'manager'] } },
         { path: 'employees/new', name: 'employee-create', component: EmployeeFormView, meta: { roles: ['admin'] } },
         // props: true pasa el :id de la URL como prop al componente
+        { path: 'leave-requests', name: 'leave-requests', component: LeaveRequestsView },
         { path: 'employees/:id/edit', name: 'employee-edit', component: EmployeeFormView, props: true, meta: { roles: ['admin'] } },
       ],
     },

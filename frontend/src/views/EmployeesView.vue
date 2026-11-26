@@ -2,6 +2,8 @@
 import { ref, watch, onMounted } from 'vue'
 import http from '@/api/http'
 import { useAuthStore } from '@/stores/auth'
+import AppPagination from '@/components/AppPagination.vue'
+import { formatDate } from '@/utils/format'
 
 const auth = useAuthStore()
 const isAdmin = auth.user?.role === 'admin' // solo el admin crea y edita (EmployeePolicy)
@@ -42,9 +44,6 @@ watch(search, () => {
 })
 
 onMounted(() => load())
-
-// La API devuelve "2019-11-25"; se formatea sin pasar por Date para evitar desfases de zona horaria
-const formatDate = (iso) => iso.split('-').reverse().join('/')
 </script>
 
 <template>
@@ -99,23 +98,5 @@ const formatDate = (iso) => iso.split('-').reverse().join('/')
     </table>
   </div>
 
-  <nav v-if="meta && meta.last_page > 1" class="pagination" aria-label="Paginación">
-    <button
-      type="button"
-      class="btn btn-secondary"
-      :disabled="loading || meta.current_page === 1"
-      @click="load(meta.current_page - 1)"
-    >
-      Anterior
-    </button>
-    <span>Mostrando {{ meta.from }}–{{ meta.to }} de {{ meta.total }}</span>
-    <button
-      type="button"
-      class="btn btn-secondary"
-      :disabled="loading || meta.current_page === meta.last_page"
-      @click="load(meta.current_page + 1)"
-    >
-      Siguiente
-    </button>
-  </nav>
+  <AppPagination :meta="meta" :loading="loading" @change="load" />
 </template>

@@ -324,3 +324,95 @@ a.btn {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+h2 {
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+}
+
+.page-header h2 {
+  margin: 0;
+}
+
+/* Ausencias: saldo y formulario lado a lado; en móvil, uno debajo del otro */
+.leave-top {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.stats dt {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.stats dd {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.stats .stat-main {
+  font-size: 2rem;
+  color: var(--color-primary);
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0 1rem;
+}
+
+.form-message {
+  margin: 0.75rem 0 0;
+}
+
+.btn-small {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cell-comment {
+  white-space: normal;
+  min-width: 160px;
+  color: var(--color-muted);
+}
+
+.badge-pending {
+  background: #fff4e0;
+  color: #8a5300;
+}
+
+.badge-approved {
+  background: #e3f4e8;
+  color: #1e6b3a;
+}
+
+.badge-rejected {
+  background: #fdecea;
+  color: var(--color-error);
+}
+
+.badge-cancelled {
+  background: #eceff3;
+  color: var(--color-muted);
+}
