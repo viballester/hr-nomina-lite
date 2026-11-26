@@ -72,6 +72,10 @@ Se actualiza al final de cada módulo. Marcar solo lo **implementado y verificad
 - [ ] Qué es la fuerza bruta y por qué el límite del login se aplica por email+IP y no solo por IP
 - [ ] Qué significan el código 429 y la cabecera `Retry-After`
 - [ ] Dónde guarda Laravel los contadores del rate limiting y qué cambia con varias instancias
+- [ ] Qué es CORS, quién lo aplica (el navegador, no el servidor) y por qué `*` es mala idea
+- [ ] Qué es una petición preflight (`OPTIONS`)
+- [ ] Qué es el clickjacking y cómo lo evitan `X-Frame-Options` y `frame-ancestors`
+- [ ] Por qué los datos personales llevan `Cache-Control: no-store`
 
 ## Notas
 - Dedicación estimada: ~6 h/día.
