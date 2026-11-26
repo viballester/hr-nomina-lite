@@ -4,6 +4,7 @@ import LoginView from '@/views/LoginView.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import HomeView from '@/views/HomeView.vue'
 import EmployeesView from '@/views/EmployeesView.vue'
+import EmployeeFormView from '@/views/EmployeeFormView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +18,9 @@ const router = createRouter({
         { path: '', name: 'home', component: HomeView },
         // meta.roles: solo estos roles pueden entrar (la API devolvería 403 al resto)
         { path: 'employees', name: 'employees', component: EmployeesView, meta: { roles: ['admin', 'manager'] } },
+        { path: 'employees/new', name: 'employee-create', component: EmployeeFormView, meta: { roles: ['admin'] } },
+        // props: true pasa el :id de la URL como prop al componente
+        { path: 'employees/:id/edit', name: 'employee-edit', component: EmployeeFormView, props: true, meta: { roles: ['admin'] } },
       ],
     },
     // Cualquier URL desconocida vuelve al inicio

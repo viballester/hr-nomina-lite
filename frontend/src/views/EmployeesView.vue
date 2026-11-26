@@ -1,6 +1,10 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import http from '@/api/http'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
+const isAdmin = auth.user?.role === 'admin' // solo el admin crea y edita (EmployeePolicy)
 
 const employees = ref([])
 const meta = ref(null) // datos de paginación que devuelve Laravel
@@ -53,6 +57,7 @@ const formatDate = (iso) => iso.split('-').reverse().join('/')
       placeholder="Buscar por nombre o email"
       aria-label="Buscar empleados por nombre o email"
     >
+    <RouterLink v-if="isAdmin" :to="{ name: 'employee-create' }" class="btn">Nuevo empleado</RouterLink>
   </div>
 
   <p v-if="error" class="error" role="alert">{{ error }}</p>
@@ -67,6 +72,7 @@ const formatDate = (iso) => iso.split('-').reverse().join('/')
           <th>Puesto</th>
           <th>Alta</th>
           <th>Estado</th>
+          <th v-if="isAdmin"><span class="visually-hidden">Acciones</span></th>
         </tr>
       </thead>
       <tbody>
@@ -82,9 +88,12 @@ const formatDate = (iso) => iso.split('-').reverse().join('/')
               {{ employee.status === 'active' ? 'Activo' : 'Baja' }}
             </span>
           </td>
+          <td v-if="isAdmin">
+            <RouterLink :to="{ name: 'employee-edit', params: { id: employee.id } }">Editar</RouterLink>
+          </td>
         </tr>
         <tr v-if="!loading && employees.length === 0">
-          <td colspan="6" class="empty">No hay empleados que coincidan con la búsqueda.</td>
+          <td :colspan="isAdmin ? 7 : 6" class="empty">No hay empleados que coincidan con la búsqueda.</td>
         </tr>
       </tbody>
     </table>

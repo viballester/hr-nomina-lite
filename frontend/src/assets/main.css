@@ -278,3 +278,49 @@ a {
   margin-top: 1rem;
   color: var(--color-muted);
 }
+
+/* Formularios de alta y edición */
+.form {
+  max-width: 560px;
+}
+
+.field [aria-invalid='true'] {
+  border-color: var(--color-error);
+}
+
+.field-error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-error);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+a.btn {
+  text-decoration: none;
+}
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #fdecea;
+}
+
+/* Texto solo para lectores de pantalla */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
