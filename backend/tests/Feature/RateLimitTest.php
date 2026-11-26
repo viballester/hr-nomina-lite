@@ -38,6 +38,15 @@ class RateLimitTest extends TestCase
             ->assertOk();
     }
 
+    public function test_una_ip_no_puede_probar_mas_de_20_emails_por_minuto(): void
+    {
+        for ($i = 0; $i < 20; $i++) {
+            $this->postJson('/api/login', ['email' => "u{$i}@demo.test", 'password' => 'x'])->assertStatus(422);
+        }
+
+        $this->postJson('/api/login', ['email' => 'otro@demo.test', 'password' => 'x'])->assertStatus(429);
+    }
+
     public function test_la_api_autenticada_limita_a_60_peticiones_por_minuto(): void
     {
         Sanctum::actingAs(User::factory()->create());

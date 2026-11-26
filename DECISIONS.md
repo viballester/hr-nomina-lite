@@ -102,9 +102,9 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Límites:** sin paginación del recibo (máx. 50 líneas); sin caché de PDFs, se generan en cada descarga.
 
 ## D-024 · Rate limiting (2026-11-26)
-**Decisión:** limitadores con nombre en `AppServiceProvider`: `login` a 5 intentos/min por email+IP (429 con mensaje en español y `Retry-After`) y `api` a 60 peticiones/min por usuario autenticado. Contadores en el `CACHE_STORE` (tabla `cache` en desarrollo, `array` en tests).
+**Decisión:** limitadores con nombre en `AppServiceProvider`: `login` a 5 intentos/min por email+IP y 20/min por IP (contra "password spraying") (429 con mensaje en español y `Retry-After`) y `api` a 60 peticiones/min por usuario autenticado. Contadores en el `CACHE_STORE` (tabla `cache` en desarrollo, `array` en tests).
 **Por qué:** frena la fuerza bruta de contraseñas sin bloquear a otros usuarios tras la misma IP (oficina con NAT); el límite general protege de clientes descontrolados.
-**Límites:** con varias instancias de la app habría que usar un caché compartido (Redis); no hay bloqueo progresivo ni CAPTCHA.
+**Límites:** los tokens inválidos no cuentan para el límite `api` (se rechazan en `auth:sanctum` antes del throttle); se acepta porque un token Sanctum de 40 caracteres aleatorios no es adivinable por fuerza bruta. Con varias instancias de la app habría que usar un caché compartido (Redis); no hay bloqueo progresivo ni CAPTCHA.
 
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
