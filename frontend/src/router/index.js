@@ -6,6 +6,9 @@ import HomeView from '@/views/HomeView.vue'
 import EmployeesView from '@/views/EmployeesView.vue'
 import EmployeeFormView from '@/views/EmployeeFormView.vue'
 import LeaveRequestsView from '@/views/LeaveRequestsView.vue'
+import PayrollPeriodsView from '@/views/PayrollPeriodsView.vue'
+import PayslipsView from '@/views/PayslipsView.vue'
+import PayslipDetailView from '@/views/PayslipDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +26,9 @@ const router = createRouter({
         // props: true pasa el :id de la URL como prop al componente
         { path: 'leave-requests', name: 'leave-requests', component: LeaveRequestsView },
         { path: 'employees/:id/edit', name: 'employee-edit', component: EmployeeFormView, props: true, meta: { roles: ['admin'] } },
+        { path: 'payroll-periods', name: 'payroll-periods', component: PayrollPeriodsView, meta: { roles: ['admin'] } },
+        { path: 'payslips', name: 'payslips', component: PayslipsView },
+        { path: 'payslips/:id', name: 'payslip-detail', component: PayslipDetailView, props: true },
       ],
     },
     // Cualquier URL desconocida vuelve al inicio

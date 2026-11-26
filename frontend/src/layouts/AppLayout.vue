@@ -23,6 +23,8 @@ async function logout() {
         <!-- Ocultar el enlace es comodidad, no seguridad: la API ya responde 403 -->
         <RouterLink v-if="['admin', 'manager'].includes(auth.user?.role)" to="/employees">Empleados</RouterLink>
         <RouterLink to="/leave-requests">Ausencias</RouterLink>
+        <RouterLink to="/payslips">Nóminas</RouterLink>
+        <RouterLink v-if="auth.user?.role === 'admin'" to="/payroll-periods">Periodos</RouterLink>
       </nav>
 
       <div class="session">
