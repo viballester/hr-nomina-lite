@@ -45,3 +45,9 @@ test('formatEuros usa formato español sin pasar por float', () => {
   assert.equal(formatEuros('0.05'), '0,05 €');
   assert.equal(formatEuros('-150.00'), '-150,00 €');
 });
+
+test('rechaza importes desmesurados sin procesarlos', () => withServer(async (url) => {
+  const res = await post(url, { ...validPayslip(), gross: `${'9'.repeat(50000)}.00` });
+  assert.equal(res.status, 422);
+  assert.ok((await res.json()).errors.includes('gross: importe con formato 0.00'));
+}));
