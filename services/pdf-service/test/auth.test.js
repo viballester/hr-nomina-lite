@@ -13,8 +13,8 @@ test('con token incorrecto devuelve 401', () => withServer(async (url) => {
   assert.equal((await post(url, { Authorization: 'Bearer otro' })).status, 401);
 }));
 
-test('con token correcto pasa el middleware (404 hasta que exista la ruta)', () => withServer(async (url) => {
-  assert.equal((await post(url, { Authorization: `Bearer ${TOKEN}` })).status, 404);
+test('con token correcto pasa el middleware y llega a la validación (422)', () => withServer(async (url) => {
+  assert.equal((await post(url, { Authorization: `Bearer ${TOKEN}` })).status, 422);
 }));
 
 test('no arranca sin token configurado', () => {
