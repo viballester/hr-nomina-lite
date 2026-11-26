@@ -1,15 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createApp } from '../src/app.js';
+import { withServer } from './helpers.js';
 
-test('GET /health responde ok', async () => {
-  const server = createApp().listen(0);
-  const { port } = server.address();
-  try {
-    const res = await fetch(`http://127.0.0.1:${port}/health`);
-    assert.equal(res.status, 200);
-    assert.deepEqual(await res.json(), { status: 'ok' });
-  } finally {
-    server.close();
-  }
-});
+test('GET /health responde ok sin token', () => withServer(async (url) => {
+  const res = await fetch(`${url}/health`);
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { status: 'ok' });
+}));
