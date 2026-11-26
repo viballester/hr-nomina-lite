@@ -69,5 +69,9 @@ Se actualiza al final de cada módulo. Marcar solo lo **implementado y verificad
 - [ ] Por qué la Policy va antes de llamar a Node (y cómo lo prueba `Http::assertNothingSent`)
 - [ ] Qué aporta `Http::fake()` y qué no prueba (el servicio real)
 
+- [ ] Qué es la fuerza bruta y por qué el límite del login se aplica por email+IP y no solo por IP
+- [ ] Qué significan el código 429 y la cabecera `Retry-After`
+- [ ] Dónde guarda Laravel los contadores del rate limiting y qué cambia con varias instancias
+
 ## Notas
 - Dedicación estimada: ~6 h/día.

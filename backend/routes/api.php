@@ -12,9 +12,9 @@ use App\Http\Controllers\Api\PayrollPeriodController;
 use App\Http\Controllers\Api\PayslipController;
 use App\Http\Controllers\Api\DashboardController;
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::get('/dashboard', DashboardController::class);
