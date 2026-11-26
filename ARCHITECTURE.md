@@ -32,6 +32,8 @@ APP_WEB/
 
 Implementado en M3: `LeaveRequestService` (reglas de ausencias, transacciones y bloqueos) y `LeaveRequestPolicy`.
 
+Implementado en M4: `Services/Payroll` (`PayrollCalculator` + reglas `PayrollRule`, sin base de datos, y `PayrollService` para generar y cerrar periodos).
+
 Endpoints de ausencias (todos con `auth:sanctum`):
 ```
 GET   /api/leave-requests[?status=]        listado filtrado por rol

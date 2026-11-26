@@ -86,6 +86,11 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Por qué:** un concepto nuevo es una clase nueva (abierto/cerrado) y se prueba sin base de datos. Alternativa descartada: un único método con todas las fórmulas.
 **Límites:** sin prorrateo de meses incompletos, pagas extra ni importes negativos.
 
+## D-021 · Generación y cierre de periodos en `PayrollService` (2026-11-26)
+**Decisión:** un periodo en borrador puede regenerarse (borra sus nóminas y las recalcula); uno cerrado no cambia. Generar y cerrar van en transacción con `lockForUpdate` sobre el periodo. El snapshot (D-006) se guarda al generar y queda congelado al cerrar. Entran los empleados activos con contrato vigente algún día del mes; con varios, el más reciente. La antigüedad se cuenta a fin de mes.
+**Por qué:** permite corregir datos antes del cierre sin duplicar nóminas.
+**Límites:** sin prorrateo; un empleado dado de baja lógica durante el mes no genera nómina.
+
 ## Pendientes de decidir
 - Pest vs PHPUnit (M7).
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).

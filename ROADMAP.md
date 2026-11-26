@@ -13,7 +13,7 @@ Leyenda: ⬜ pendiente · 🟨 en curso · ✅ completado y verificado
 | M1 | Modelado ER, migraciones, seeders, factories, Eloquent | M0 | ✅ |
 | M2 | Auth (Sanctum), roles, Policies, CRUD empleados, validación y errores | M1 | ✅ |
 | M3 | Ausencias: solicitud, saldo, aprobación, solapes | M2 | ✅ |
-| M4 | Nóminas: periodos, cálculo simplificado, líneas, snapshot | M2 | 🟨 tarea 1 de 4 (calculadora) |
+| M4 | Nóminas: periodos, cálculo simplificado, líneas, snapshot | M2 | 🟨 tareas 1-2 de 4 (calculadora y servicio) |
 | M5 | Microservicio Node (pdfkit) + integración Laravel↔Node | M4 | ⬜ |
 | M6 | Frontend Vue (login, empleados, ausencias, nóminas, dashboard) | M2 (paralelo a M3/M4) | 🟨 login, empleados y ausencias ✅; nóminas y dashboard tras M4 |
 | M7 | Testing, seguridad (OWASP), rate limiting, CORS | M3–M6 | ⬜ |
