@@ -6,6 +6,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Defensa en profundidad: aunque quedara un token vivo (p. ej. de antes de revocar en la baja),
+        // un empleado inactivo no se autentica.
+        Sanctum::authenticateAccessTokensUsing(
+            fn ($token, bool $isValid) => $isValid && $token->tokenable?->employee?->status !== 'inactive'
+        );
+
         // Login: frena la fuerza bruta. Clave email+IP para no bloquear a toda una oficina tras un mismo NAT.
         // El límite por IP frena además el "password spraying" (una IP probando muchos emails).
         RateLimiter::for('login', function (Request $request) {

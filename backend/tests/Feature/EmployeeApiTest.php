@@ -186,6 +186,15 @@ class EmployeeApiTest extends TestCase
         $this->assertDatabaseMissing('personal_access_tokens', ['tokenable_id' => $empleado->user_id]);
     }
 
+    public function test_un_empleado_inactivo_con_token_vivo_responde_401(): void
+    {
+        $empleado = $this->employeeWithRole('employee', $this->rrhh);
+        $token = $empleado->user->createToken('api')->plainTextToken;
+        $empleado->updateQuietly(['status' => 'inactive']); // simula un token que sobrevivió a la baja
+
+        $this->withToken($token)->getJson('/api/me')->assertStatus(401);
+    }
+
     public function test_un_token_caducado_responde_401(): void
     {
         $user = $this->employeeWithRole('employee', $this->rrhh)->user;
