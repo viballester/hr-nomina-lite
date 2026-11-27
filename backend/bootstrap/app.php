@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append([\App\Http\Middleware\SecurityHeaders::class]);
+        // Tras nginx, la IP real llega en X-Forwarded-For (rate limiting por IP). Sin la variable no se confía en nadie.
+        $middleware->trustProxies(at: array_filter(explode(',', (string) env('TRUSTED_PROXIES', ''))));
         $middleware->redirectGuestsTo(fn (Request $request) => $request->is('api/*') ? null : '/');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
