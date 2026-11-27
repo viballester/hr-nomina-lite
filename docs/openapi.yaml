@@ -3,7 +3,7 @@ info:
   title: HR Nómina API
   version: 1.0.0
   description: |
-    API REST de la aplicación de RR. HH. y nóminas (Laravel 12 + Sanctum).
+    API REST de la aplicación de RR. HH. y nóminas (Laravel 13 + Sanctum).
 
     **Autenticación:** `POST /login` devuelve un token. Envíalo en cada petición como
     `Authorization: Bearer <token>` (botón *Authorize*). Caduca a las 8 h (`SANCTUM_EXPIRATION`).
