@@ -160,4 +160,48 @@ class EmployeeApiTest extends TestCase
 
         $this->assertDatabaseHas('employees', ['id' => $empleado->id, 'status' => 'inactive']);
     }
+
+    public function test_la_baja_revoca_los_tokens_y_bloquea_el_login(): void
+    {
+        $empleado = $this->employeeWithRole('employee', $this->rrhh);
+        $empleado->user->update(['password' => 'secreto123']);
+        $empleado->user->createToken('api');
+
+        Sanctum::actingAs($this->employeeWithRole('admin', $this->rrhh)->user);
+        $this->deleteJson("/api/employees/{$empleado->id}")->assertNoContent();
+
+        $this->assertDatabaseMissing('personal_access_tokens', ['tokenable_id' => $empleado->user_id]);
+        $this->postJson('/api/login', ['email' => $empleado->user->email, 'password' => 'secreto123'])
+            ->assertStatus(422);
+    }
+
+    public function test_la_baja_por_edicion_tambien_revoca_los_tokens(): void
+    {
+        $empleado = $this->employeeWithRole('employee', $this->rrhh);
+        $empleado->user->createToken('api');
+
+        Sanctum::actingAs($this->employeeWithRole('admin', $this->rrhh)->user);
+        $this->putJson("/api/employees/{$empleado->id}", ['status' => 'inactive'])->assertOk();
+
+        $this->assertDatabaseMissing('personal_access_tokens', ['tokenable_id' => $empleado->user_id]);
+    }
+
+    public function test_un_empleado_inactivo_con_token_vivo_responde_401(): void
+    {
+        $empleado = $this->employeeWithRole('employee', $this->rrhh);
+        $token = $empleado->user->createToken('api')->plainTextToken;
+        $empleado->updateQuietly(['status' => 'inactive']); // simula un token que sobrevivió a la baja
+
+        $this->withToken($token)->getJson('/api/me')->assertStatus(401);
+    }
+
+    public function test_un_token_caducado_responde_401(): void
+    {
+        $user = $this->employeeWithRole('employee', $this->rrhh)->user;
+        $token = $user->createToken('api')->plainTextToken;
+
+        $this->travel(config('sanctum.expiration') + 1)->minutes();
+
+        $this->withToken($token)->getJson('/api/me')->assertStatus(401);
+    }
 }

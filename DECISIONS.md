@@ -101,7 +101,27 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Detalles:** validación escrita a mano (pocos campos, sin Zod/Joi); importes acotados a 10 dígitos enteros tras una revisión de seguridad (ReDoS); tests de Node con `node:test` (sin Jest) y de Laravel con `Http::fake()`.
 **Límites:** sin paginación del recibo (máx. 50 líneas); sin caché de PDFs, se generan en cada descarga.
 
+## D-024 · Rate limiting (2026-11-26)
+**Decisión:** limitadores con nombre en `AppServiceProvider`: `login` a 5 intentos/min por email+IP y 20/min por IP (contra "password spraying") (429 con mensaje en español y `Retry-After`) y `api` a 60 peticiones/min por usuario autenticado. Contadores en el `CACHE_STORE` (tabla `cache` en desarrollo, `array` en tests).
+**Por qué:** frena la fuerza bruta de contraseñas sin bloquear a otros usuarios tras la misma IP (oficina con NAT); el límite general protege de clientes descontrolados.
+**Límites:** los tokens inválidos no cuentan para el límite `api` (se rechazan en `auth:sanctum` antes del throttle); se acepta porque un token Sanctum de 40 caracteres aleatorios no es adivinable por fuerza bruta. Detrás de un proxy (nginx, M8) hay que configurar `trustProxies` o todos los usuarios compartirían la IP del proxy. Con varias instancias de la app habría que usar un caché compartido (Redis); no hay bloqueo progresivo ni CAPTCHA.
+
+## D-025 · CORS y cabeceras de seguridad (2026-11-26)
+**Decisión:** `config/cors.php` deja de aceptar cualquier origen (`*`, el valor por defecto) y solo admite los de `CORS_ALLOWED_ORIGINS` (por defecto `http://localhost:5173`), con métodos y cabeceras explícitos. Un middleware global `SecurityHeaders` añade `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Content-Security-Policy: default-src 'none'` y `Cache-Control: no-store`.
+**Por qué:** "cerrado por defecto"; la API sirve datos personales y salarios, que no deben cachearse ni embeberse. En desarrollo el proxy de Vite hace que no haya peticiones de origen cruzado.
+**Detalles:** el middleware es global (no del grupo `api`) porque así también cubre las respuestas de error como el 401. La CSP estricta vale para la API; el frontend necesitará la suya cuando lo sirva nginx (M8).
+
+## D-026 · Baja de empleados y caducidad de tokens (2026-11-26)
+**Decisión:** al dar de baja un empleado (por `DELETE` o por `PUT` con `status: inactive`; hook `updated` del modelo `Employee`) se borran sus tokens, Sanctum rechaza cualquier token de un empleado inactivo (`authenticateAccessTokensUsing`, defensa en profundidad) y el login lo rechaza con el mismo mensaje que unas credenciales incorrectas. Los tokens Sanctum caducan a los 480 min (`SANCTUM_EXPIRATION`); el interceptor de Vue ya cierra la sesión ante un 401.
+**Por qué:** hallazgos del repaso OWASP (A01 y A07, ver `docs/SECURITY.md`): una baja no cortaba el acceso y un token robado valía para siempre.
+**Límites:** un ex-empleado no puede descargar sus nóminas antiguas; los tokens caducados no se borran de la tabla.
+
+## D-027 · Tests del frontend con Vitest y barrido de rutas protegidas (2026-11-26)
+**Decisión:** Vitest (usa la misma configuración de Vite, alias `@` incluido) para probar lógica pura del frontend: utilidades de formato y el store de auth con `http` simulado (`vi.mock`) y `localStorage` en memoria; sin jsdom ni tests de componentes. En el backend, `ProtectedRoutesTest` recorre todas las rutas `api/*` y exige 401 sin token.
+**Por qué:** máximo valor con el mínimo de dependencias; el barrido de rutas detecta automáticamente una ruta nueva que se quede fuera de `auth:sanctum`.
+**Límites:** no hay tests de componentes ni end-to-end; las pantallas se verifican a mano en el navegador.
+
 ## Pendientes de decidir
-- Pest vs PHPUnit (M7).
+- ~~Pest vs PHPUnit (M7)~~ → PHPUnit, el que ya usamos (99 tests): cambiar no aporta en el plazo.
 - Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).
 - Despliegue en vivo (Render/VPS) o solo Docker + README (M8).

@@ -19,7 +19,8 @@ class AuthController extends Controller
 
         $user = User::where('email', $data['email'])->first();
 
-        if (! $user || ! Hash::check($data['password'], $user->password)) {
+        // Un empleado dado de baja recibe el mismo mensaje: no revelamos qué cuentas existen.
+        if (! $user || ! Hash::check($data['password'], $user->password) || $user->employee?->status === 'inactive') {
             throw ValidationException::withMessages([
                 'email' => ['Credenciales incorrectas.'],
             ]);
