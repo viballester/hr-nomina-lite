@@ -1,0 +1,559 @@
+openapi: 3.0.3
+info:
+  title: HR Nómina API
+  version: 1.0.0
+  description: |
+    API REST de la aplicación de RR. HH. y nóminas (Laravel 13 + Sanctum).
+
+    **Autenticación:** `POST /login` devuelve un token. Envíalo en cada petición como
+    `Authorization: Bearer <token>` (botón *Authorize*). Caduca a las 8 h (`SANCTUM_EXPIRATION`).
+
+    **Roles:** `admin`, `manager` (su departamento) y `employee` (sus propios datos).
+    La autorización la deciden las Policies del backend; un 403 significa que el rol no puede.
+
+    **Límites:** login 5 intentos/min por email+IP y 20/min por IP; resto 60 peticiones/min. Exceso → 429 con `Retry-After`.
+
+    Los cálculos de nómina son **simplificados y ficticios**: no tienen validez legal.
+servers:
+  - url: /api
+    description: Mismo origen (Swagger UI en /docs, detrás de nginx)
+  - url: http://localhost:8000/api
+    description: Laravel directo
+security:
+  - bearerAuth: []
+tags:
+  - name: Auth
+  - name: Dashboard
+  - name: Empleados
+  - name: Catálogos
+  - name: Ausencias
+  - name: Nóminas
+
+paths:
+  /login:
+    post:
+      tags: [Auth]
+      summary: Iniciar sesión
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email, example: admin@demo.test }
+                password: { type: string, example: password }
+      responses:
+        '200':
+          description: Token emitido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string, example: 1|abc123... }
+                  user: { $ref: '#/components/schemas/User' }
+        '422':
+          description: Credenciales incorrectas (mismo mensaje si el usuario no existe o está de baja)
+          content: { application/json: { schema: { $ref: '#/components/schemas/ValidationError' } } }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /logout:
+    post:
+      tags: [Auth]
+      summary: Revocar el token actual
+      responses:
+        '204': { description: Sesión cerrada }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+  /me:
+    get:
+      tags: [Auth]
+      summary: Usuario autenticado
+      responses:
+        '200':
+          description: Usuario
+          content: { application/json: { schema: { $ref: '#/components/schemas/User' } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  /dashboard:
+    get:
+      tags: [Dashboard]
+      summary: KPIs según el rol
+      description: Los KPIs que no aplican al rol vienen a `null` (p. ej. `active_employees` para un empleado).
+      responses:
+        '200':
+          description: KPIs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      active_employees: { type: integer, nullable: true }
+                      pending_requests: { type: integer }
+                      absent_today: { type: integer }
+                      leave_days_available: { type: integer, nullable: true }
+                      last_payroll: { type: object, nullable: true }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /employees:
+    get:
+      tags: [Empleados]
+      summary: Listar empleados (paginado, 15 por página)
+      description: El admin ve todos; el manager, los de su departamento; el empleado no tiene acceso.
+      parameters:
+        - { name: search, in: query, schema: { type: string }, description: Filtra por nombre o email }
+        - { $ref: '#/components/parameters/Page' }
+      responses:
+        '200':
+          description: Página de empleados
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data: { type: array, items: { $ref: '#/components/schemas/Employee' } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Empleados]
+      summary: Alta de empleado (admin)
+      description: Crea usuario y ficha en una transacción. La contraseña se genera aleatoria.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, department_id, position_id, hire_date]
+              properties:
+                name: { type: string, maxLength: 255 }
+                email: { type: string, format: email, maxLength: 255 }
+                department_id: { type: integer }
+                position_id: { type: integer }
+                hire_date: { type: string, format: date }
+      responses:
+        '201': { $ref: '#/components/responses/EmployeeOk' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Invalid' }
+  /employees/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Empleados]
+      summary: Ver empleado
+      responses:
+        '200': { $ref: '#/components/responses/EmployeeOk' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Empleados]
+      summary: Editar empleado (admin)
+      description: Todos los campos son opcionales. `status=inactive` da de baja y revoca sus tokens.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                department_id: { type: integer }
+                position_id: { type: integer }
+                hire_date: { type: string, format: date }
+                status: { type: string, enum: [active, inactive] }
+      responses:
+        '200': { $ref: '#/components/responses/EmployeeOk' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Invalid' }
+    delete:
+      tags: [Empleados]
+      summary: Baja de empleado (admin)
+      description: Baja lógica (status inactive) y revocación de tokens; no borra el historial.
+      responses:
+        '204': { description: Dado de baja }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /departments:
+    get:
+      tags: [Catálogos]
+      summary: Listar departamentos
+      responses:
+        '200': { $ref: '#/components/responses/NamedList' }
+    post:
+      tags: [Catálogos]
+      summary: Crear departamento (admin)
+      requestBody: { $ref: '#/components/requestBodies/Named' }
+      responses:
+        '201': { $ref: '#/components/responses/NamedOk' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Invalid' }
+  /departments/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Catálogos]
+      summary: Ver departamento
+      responses:
+        '200': { $ref: '#/components/responses/NamedOk' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Catálogos]
+      summary: Renombrar departamento (admin)
+      requestBody: { $ref: '#/components/requestBodies/Named' }
+      responses:
+        '200': { $ref: '#/components/responses/NamedOk' }
+        '422': { $ref: '#/components/responses/Invalid' }
+    delete:
+      tags: [Catálogos]
+      summary: Borrar departamento (admin)
+      responses:
+        '204': { description: Borrado }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /positions:
+    get:
+      tags: [Catálogos]
+      summary: Listar puestos
+      responses:
+        '200': { $ref: '#/components/responses/NamedList' }
+    post:
+      tags: [Catálogos]
+      summary: Crear puesto (admin)
+      requestBody: { $ref: '#/components/requestBodies/Named' }
+      responses:
+        '201': { $ref: '#/components/responses/NamedOk' }
+        '422': { $ref: '#/components/responses/Invalid' }
+  /positions/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Catálogos]
+      summary: Ver puesto
+      responses:
+        '200': { $ref: '#/components/responses/NamedOk' }
+    put:
+      tags: [Catálogos]
+      summary: Renombrar puesto (admin)
+      requestBody: { $ref: '#/components/requestBodies/Named' }
+      responses:
+        '200': { $ref: '#/components/responses/NamedOk' }
+    delete:
+      tags: [Catálogos]
+      summary: Borrar puesto (admin)
+      responses:
+        '204': { description: Borrado }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /leave-types:
+    get:
+      tags: [Catálogos]
+      summary: Tipos de ausencia
+      responses:
+        '200': { description: Lista de tipos }
+
+  /leave-balance:
+    get:
+      tags: [Ausencias]
+      summary: Saldo de vacaciones del empleado autenticado (año en curso)
+      responses:
+        '200': { description: 'Saldo: días generados, consumidos y disponibles' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /leave-requests:
+    get:
+      tags: [Ausencias]
+      summary: Listar solicitudes visibles (paginado)
+      description: Empleado → las suyas; manager → las de su departamento; admin → todas.
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [pending, approved, rejected, cancelled] } }
+        - { $ref: '#/components/parameters/Page' }
+      responses:
+        '200':
+          description: Página de solicitudes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data: { type: array, items: { $ref: '#/components/schemas/LeaveRequest' } }
+    post:
+      tags: [Ausencias]
+      summary: Solicitar ausencia
+      description: Valida saldo disponible y que no se solape con otra solicitud pendiente o aprobada.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [leave_type_id, start_date, end_date]
+              properties:
+                leave_type_id: { type: integer }
+                start_date: { type: string, format: date }
+                end_date: { type: string, format: date }
+      responses:
+        '201': { $ref: '#/components/responses/LeaveOk' }
+        '422': { $ref: '#/components/responses/Invalid' }
+  /leave-requests/{id}/approve:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    patch:
+      tags: [Ausencias]
+      summary: Aprobar (manager del departamento o admin)
+      responses:
+        '200': { $ref: '#/components/responses/LeaveOk' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Invalid' }
+  /leave-requests/{id}/reject:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    patch:
+      tags: [Ausencias]
+      summary: Rechazar con motivo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comment]
+              properties:
+                comment: { type: string, maxLength: 500 }
+      responses:
+        '200': { $ref: '#/components/responses/LeaveOk' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Invalid' }
+  /leave-requests/{id}/cancel:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    patch:
+      tags: [Ausencias]
+      summary: Cancelar la propia solicitud pendiente
+      responses:
+        '200': { $ref: '#/components/responses/LeaveOk' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /payroll-periods:
+    get:
+      tags: [Nóminas]
+      summary: Listar periodos (admin, paginado)
+      responses:
+        '200': { description: Lista de periodos }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Nóminas]
+      summary: Abrir periodo mensual (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [year, month]
+              properties:
+                year: { type: integer, minimum: 2000, maximum: 2100 }
+                month: { type: integer, minimum: 1, maximum: 12 }
+      responses:
+        '201': { $ref: '#/components/responses/PeriodOk' }
+        '422': { $ref: '#/components/responses/Invalid' }
+  /payroll-periods/{id}/generate:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [Nóminas]
+      summary: Calcular los recibos del periodo (admin)
+      description: Recalcula en una transacción. Un periodo cerrado no se puede regenerar.
+      responses:
+        '200': { $ref: '#/components/responses/PeriodOk' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Invalid' }
+  /payroll-periods/{id}/close:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    patch:
+      tags: [Nóminas]
+      summary: Cerrar periodo (admin); los recibos quedan inmutables
+      responses:
+        '200': { $ref: '#/components/responses/PeriodOk' }
+        '422': { $ref: '#/components/responses/Invalid' }
+  /payslips:
+    get:
+      tags: [Nóminas]
+      summary: Listar recibos visibles (paginado)
+      description: El empleado solo ve los suyos de periodos cerrados; el manager no ve salarios.
+      responses:
+        '200':
+          description: Recibos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Payslip' } }
+  /payslips/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Nóminas]
+      summary: Ver recibo con sus líneas y snapshot
+      responses:
+        '200':
+          description: Recibo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Payslip' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /payslips/{id}/pdf:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Nóminas]
+      summary: Descargar el recibo en PDF (generado por el microservicio Node)
+      responses:
+        '200':
+          description: PDF
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '503': { description: Servicio de PDF no disponible }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Token de Sanctum obtenido en /login
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: integer } }
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1 } }
+  requestBodies:
+    Named:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [name]
+            properties:
+              name: { type: string, maxLength: 255, description: Único }
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        role: { type: string, enum: [admin, manager, employee] }
+    Named:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+    Employee:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        hire_date: { type: string, format: date }
+        status: { type: string, enum: [active, inactive] }
+        department: { $ref: '#/components/schemas/Named' }
+        position: { $ref: '#/components/schemas/Named' }
+    LeaveRequest:
+      type: object
+      properties:
+        id: { type: integer }
+        employee: { type: string, description: Nombre; solo en listados }
+        leave_type: { type: string }
+        start_date: { type: string, format: date }
+        end_date: { type: string, format: date }
+        days: { type: integer, description: Días laborables }
+        status: { type: string, enum: [pending, approved, rejected, cancelled] }
+        review_comment: { type: string, nullable: true }
+        can:
+          type: object
+          description: Permisos calculados por la Policy para pintar los botones en Vue
+          properties:
+            review: { type: boolean }
+            cancel: { type: boolean }
+    PayrollPeriod:
+      type: object
+      properties:
+        id: { type: integer }
+        year: { type: integer }
+        month: { type: integer }
+        status: { type: string, enum: [draft, closed] }
+        payslips_count: { type: integer }
+    Payslip:
+      type: object
+      properties:
+        id: { type: integer }
+        employee: { type: string }
+        period: { $ref: '#/components/schemas/PayrollPeriod' }
+        gross: { type: string, example: '2100.00', description: Importe decimal como texto }
+        deductions: { type: string, example: '331.80' }
+        net: { type: string, example: '1768.20' }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              concept: { type: string }
+              type: { type: string, enum: [earning, deduction] }
+              amount: { type: string }
+        snapshot: { type: object, description: Datos del empleado y contrato congelados al calcular }
+    Paginated:
+      type: object
+      properties:
+        links: { type: object }
+        meta:
+          type: object
+          properties:
+            current_page: { type: integer }
+            last_page: { type: integer }
+            total: { type: integer }
+    Message:
+      type: object
+      properties:
+        message: { type: string }
+    ValidationError:
+      type: object
+      properties:
+        message: { type: string }
+        errors:
+          type: object
+          additionalProperties: { type: array, items: { type: string } }
+  responses:
+    Unauthenticated:
+      description: Falta el token o ha caducado
+      content: { application/json: { schema: { $ref: '#/components/schemas/Message' } } }
+    Forbidden:
+      description: La Policy no lo permite para este rol
+      content: { application/json: { schema: { $ref: '#/components/schemas/Message' } } }
+    NotFound:
+      description: No existe
+      content: { application/json: { schema: { $ref: '#/components/schemas/Message' } } }
+    Conflict:
+      description: Tiene registros asociados
+      content: { application/json: { schema: { $ref: '#/components/schemas/Message' } } }
+    Invalid:
+      description: Error de validación o regla de negocio
+      content: { application/json: { schema: { $ref: '#/components/schemas/ValidationError' } } }
+    TooManyRequests:
+      description: Límite superado; ver cabecera Retry-After
+    EmployeeOk:
+      description: Empleado
+      content: { application/json: { schema: { type: object, properties: { data: { $ref: '#/components/schemas/Employee' } } } } }
+    LeaveOk:
+      description: Solicitud
+      content: { application/json: { schema: { type: object, properties: { data: { $ref: '#/components/schemas/LeaveRequest' } } } } }
+    PeriodOk:
+      description: Periodo
+      content: { application/json: { schema: { type: object, properties: { data: { $ref: '#/components/schemas/PayrollPeriod' } } } } }
+    NamedOk:
+      description: Elemento
+      content: { application/json: { schema: { type: object, properties: { data: { $ref: '#/components/schemas/Named' } } } } }
+    NamedList:
+      description: Lista
+      content: { application/json: { schema: { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Named' } } } } } }

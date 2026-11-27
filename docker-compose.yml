@@ -16,12 +16,33 @@ services:
       APP_LOCALE: es
       APP_FAKER_LOCALE: es_ES
       PDF_SERVICE_URL: http://pdf:3000
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-false}
+      # Redes privadas de Docker: aquí vive nginx (servicio web)
+      TRUSTED_PROXIES: 172.16.0.0/12,192.168.0.0/16,10.0.0.0/8
       PDF_SERVICE_TOKEN: ${PDF_SERVICE_TOKEN}
     depends_on:
       mysql:
         condition: service_healthy
       pdf:
         condition: service_healthy
+
+  # SPA compilada + nginx como proxy inverso hacia app
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - app
+      - swagger
+
+  # Documentación interactiva de la API (servida por nginx en /docs)
+  swagger:
+    image: swaggerapi/swagger-ui:v5.17.14
+    environment:
+      SWAGGER_JSON: /spec/openapi.yaml
+      BASE_URL: /docs
+    volumes:
+      - ./docs/openapi.yaml:/spec/openapi.yaml:ro
 
   # Microservicio de PDF: sin puerto publicado, solo accesible desde la red interna
   pdf:
