@@ -23,6 +23,14 @@ services:
       pdf:
         condition: service_healthy
 
+  # SPA compilada + nginx como proxy inverso hacia app
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - app
+
   # Microservicio de PDF: sin puerto publicado, solo accesible desde la red interna
   pdf:
     build: ./services/pdf-service
