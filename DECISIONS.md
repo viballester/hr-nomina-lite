@@ -121,7 +121,17 @@ Registro de decisiones técnicas (formato ligero ADR). Añadir una entrada nueva
 **Por qué:** máximo valor con el mínimo de dependencias; el barrido de rutas detecta automáticamente una ruta nueva que se quede fuera de `auth:sanctum`.
 **Límites:** no hay tests de componentes ni end-to-end; las pantallas se verifican a mano en el navegador.
 
+## D-028 · Docker Compose completo: nginx en el mismo origen y arranque idempotente (2026-11-27)
+**Decisión:** el frontend se compila en un Dockerfile multi-stage (Node → `dist/` → nginx). nginx sirve la SPA (`try_files` → `index.html`), reenvía `/api` a `app:8000` y `/docs` a Swagger UI, así que la app tiene un único origen (`:8080`) y no necesita CORS. Laravel sigue con `artisan serve` y el código montado. Un entrypoint idempotente instala `vendor/` si falta, crea `.env` y `APP_KEY`, ejecuta `migrate --force` y siembra solo si `SEED_DEMO_DATA=true` y no hay usuarios. Laravel confía en las redes privadas de Docker (`TRUSTED_PROXIES`) y nginx sobrescribe `X-Forwarded-For` con `$remote_addr`, para que el rate limiting vea la IP real sin que el cliente pueda falsearla.
+**Por qué:** clonar + `cp .env.example .env` + `docker compose up` deja la demo funcionando (verificado en un clon limpio). PHP-FPM no aporta nada en una demo y complica el volumen y los permisos.
+**Límites:** es un entorno de desarrollo y demo, no de producción (debug activo, `artisan serve`, credenciales demo). Quien llame a `:8000` directamente desde la red de Docker podría falsear `X-Forwarded-For`.
+
+## D-029 · Documentación de la API con OpenAPI escrito a mano y Swagger UI (2026-11-27)
+**Decisión:** `docs/openapi.yaml` (OpenAPI 3.0) escrito a partir de los FormRequests, Resources y Policies, validado con Redocly, y servido con la imagen oficial de Swagger UI detrás de nginx (`/docs`, mismo origen para que "Try it out" funcione).
+**Por qué:** frente a Scribe o Scramble, escribir el contrato obliga a entenderlo y no añade dependencias al backend; con 33 rutas es asumible.
+**Límites:** puede desincronizarse del código; no hay ningún test que compare la especificación con las rutas.
+
 ## Pendientes de decidir
 - ~~Pest vs PHPUnit (M7)~~ → PHPUnit, el que ya usamos (99 tests): cambiar no aporta en el plazo.
-- Herramienta de documentación de API: Scribe vs OpenAPI manual (M8).
-- Despliegue en vivo (Render/VPS) o solo Docker + README (M8).
+- ~~Herramienta de documentación de API (M8)~~ → OpenAPI manual + Swagger UI (D-029).
+- ~~Despliegue en vivo o solo Docker + README (M8)~~ → solo Docker + README en el MVP; el despliegue en vivo queda como ampliación.

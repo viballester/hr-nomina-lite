@@ -23,7 +23,7 @@ APP_WEB/
 ├─ docs/                  Diagramas, capturas, API docs
 ├─ CLAUDE.md  ROADMAP.md  PROJECT_CONTEXT.md  ARCHITECTURE.md
 ├─ DECISIONS.md  LEARNING_PROGRESS.md
-└─ docker-compose.yml     (se crea en M0/M8)
+└─ docker-compose.yml     app, pdf, mysql, web (nginx) y swagger
 ```
 
 ## Capas del backend (Laravel)
@@ -114,9 +114,15 @@ Puntos clave: claves foráneas con restricciones; índices en `(employee_id, sta
 
 ## Servicios Docker
 
-**Actuales:** `app` (PHP con `artisan serve`, puerto 8000), `mysql` (sin puerto publicado, datos en el volumen `mysql_data`, D-009) y `pdf` (Node 22 alpine, sin puerto publicado, healthcheck en `/health`; `app` espera a que esté sano). Ver D-023.
+| Servicio | Imagen | Puerto | Función |
+|---|---|---|---|
+| `web` | `frontend/Dockerfile` (Node → nginx) | 8080 | SPA compilada; proxy de `/api` → `app` y de `/docs` → `swagger` |
+| `app` | `docker/php/Dockerfile` (PHP 8.3 + entrypoint) | 8000 | API Laravel (`artisan serve`); migra y siembra al arrancar (D-028) |
+| `pdf` | `services/pdf-service/Dockerfile` | — | Recibos PDF; solo accesible desde `app` (D-023) |
+| `mysql` | `mysql:8.4` | — | Datos en el volumen `mysql_data` (D-009) |
+| `swagger` | `swaggerapi/swagger-ui` | — | Documentación de la API (`docs/openapi.yaml`, D-029) |
 
-**Previstos (M8):** `nginx`, `php-fpm`, `mysql`, `pdf`, `frontend` (build estático); en desarrollo, `mailpit` (opcional).
+Orden de arranque: `mysql` y `pdf` sanos (healthcheck) → `app` → `web`.
 
 ## Seguridad (resumen)
 

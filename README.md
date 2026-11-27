@@ -50,7 +50,7 @@ Es un proyecto de portafolio Full Stack (Vue 3 · Laravel 13 · Node.js · MySQL
 - **Nóminas con el patrón Strategy.** `PayrollCalculator` aplica una lista de `PayrollRule` (Open/Closed: para añadir un concepto se crea una regla nueva). Se calcula en céntimos enteros y en una transacción.
 - **Node aislado.** No accede a la base de datos ni recalcula importes: recibe un JSON ya validado y devuelve el PDF en streaming.
 
-Más detalle en [ARCHITECTURE.md](ARCHITECTURE.md) y en las 27 decisiones razonadas de [DECISIONS.md](DECISIONS.md).
+Más detalle en [ARCHITECTURE.md](ARCHITECTURE.md) y en las 29 decisiones razonadas de [DECISIONS.md](DECISIONS.md).
 
 ## Puesta en marcha
 

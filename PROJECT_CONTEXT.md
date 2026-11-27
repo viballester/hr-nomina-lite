@@ -24,7 +24,7 @@ Auth con roles · CRUD empleados/departamentos/contratos · Ausencias con saldo 
 | Backend | PHP 8.3 + Laravel 13 (API REST, Sanctum), arquitectura MVC + capa Services |
 | Microservicio | Node.js + Express + **pdfkit** (solo genera PDF) |
 | BD | MySQL 8.4 LTS |
-| Infra | Docker + Docker Compose (nginx, php-fpm, mysql, node-pdf, frontend) |
+| Infra | Docker + Docker Compose (nginx con la SPA y proxy, Laravel con `artisan serve`, mysql, pdf, Swagger UI) |
 | Tests | PHPUnit/Pest, test del servicio Node; opcional Playwright |
 
 ## Restricciones
